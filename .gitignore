@@ -1,0 +1,6 @@
+# editors
+.idea
+.vscode
+
+# internal
+.strawberry
