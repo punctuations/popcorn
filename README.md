@@ -1,1 +1,3 @@
-# 🍓 ストロベリー
+# 🍓 strawberry
+
+- use watchdog??

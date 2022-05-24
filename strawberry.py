@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -27,13 +28,23 @@ def strawberry(command):
     has_debug_flag = [element for element in debug if (element in command)]
     cmds = load_cmds()
 
+    f = open("./.berryrc")
+    config = json.load(f)
+    f.close()
+
+    if has_debug_flag:
+        print(f"ran {command}: {len(command)}")
+
     if has_alias_flag:
         print("function berry () { eval $(strawberry $@); }")
     elif has_dev_flag:
         # * Run strawberry command based on .berryrc options and pass in the path
-        print("READING FROM .berryrc")
         run_dev = getattr(cmds["dev"], "dev")
-        run_dev(command[dev_index + 1:] if len(command) >= 2 else ["-l", "."])
+        try:
+            dev_command = config["dev_cmd"]
+            os.system(dev_command)
+        except KeyError:
+            run_dev(command[dev_index + 1:] if len(command) >= 2 else ["-l", "."])
     else:
         # if argument is passed in
         if len(command) >= 1:
@@ -48,12 +59,12 @@ def strawberry(command):
         else:
             # command is: strawberry
             # * Run build command with .berryrc options
-            print("READING FROM .berryrc")
             run_build = getattr(cmds["build"], "build")
-            run_build(["."])
-
-    if has_debug_flag:
-        print(f"ran {command}: {len(command)}")
+            try:
+                build_command = config["build_cmd"]
+                os.system(build_command)
+            except KeyError:
+                run_build(["."])
 
 
 if __name__ == '__main__':

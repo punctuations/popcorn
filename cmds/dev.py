@@ -36,7 +36,7 @@ def dev(args):
         while True:
             try:
                 if f"CHANGE IN FILE {watch_file}":
-                    print("LISTENING FOR CHANGES")
+                    print("LISTENING FOR CHANGES TO FILE")
             except KeyboardInterrupt:
                 sys.exit(0)
     else:
@@ -44,6 +44,6 @@ def dev(args):
         while True:
             try:
                 if f"CHANGE IN DIRECTORY {watch_file}":
-                    print("LISTENING FOR CHANGES")
+                    print("LISTENING FOR CHANGES TO DIRECTORY")
             except KeyboardInterrupt:
                 sys.exit(0)
