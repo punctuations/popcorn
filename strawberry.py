@@ -2,6 +2,8 @@ import json
 import os
 import sys
 
+from _utils import styled_print
+
 alias = ["-a", "--alias"]
 dev = ["-d", "--dev"]
 debug = ["--debug"]
@@ -33,7 +35,7 @@ def strawberry(command):
     f.close()
 
     if has_debug_flag:
-        print(f"ran {command}: {len(command)}")
+        styled_print.info(f"ran {command}: {len(command)}")
 
     if has_alias_flag:
         print("function berry () { eval $(strawberry $@); }")

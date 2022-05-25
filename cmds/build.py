@@ -1,3 +1,5 @@
+from _utils import styled_print
+
 output = ["-o", "--output"]
 
 
@@ -14,13 +16,13 @@ def build(args):
     if has_output_flag:
         try:
             if output_index == 0:
-                print(f"Building from . outputting to {args[output_index + 1]}")
+                styled_print.info(f"Building from . outputting to {args[output_index + 1]}")
             else:
-                print(f"Building from {args[0]} outputting to {args[output_index + 1]}")
+                styled_print.info(f"Building from {args[0]} outputting to {args[output_index + 1]}")
         except IndexError:
-            print("Please specify a directory.")
+            styled_print.error("Please specify a directory.")
     else:
         if len(args) >= 1:
-            print(f"Building from {args[0]}")
+            styled_print.info(f"Building from {args[0]}")
         else:
-            print("Building from .")
+            styled_print.info("Building from .")
