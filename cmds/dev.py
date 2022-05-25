@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import sys
@@ -14,16 +15,30 @@ listen = ["-l", "--listen"]
 
 DEV_DIR = f"{os.path.realpath(os.getcwd())}{os.sep}.strawberry"
 
-last_event = {}
+last_event = {"message": False}
 event_delta = timedelta(seconds=int(2))
 
+f = open("./.berryrc")
+config = json.load(f)
+f.close()
 
-def thread_compile(event):
+
+def thread_compile():
     time.sleep(2)
 
     event_time_remaining = last_event["time"] + event_delta - datetime.now()
     if event_time_remaining.days <= -1:
-        styled_print.info(f"compiling {event.src_path}")
+        if last_event["message"]:
+            styled_print.info("Updates to config detected, to see up-to-date changes re-run this command.")
+        styled_print.event("Received compile event.")
+        try:
+            exit_status = os.WEXITSTATUS(os.system(config["seed_cmd"]))
+            if exit_status == 0:
+                styled_print.success("Compiled successfully.")
+            else:
+                styled_print.error("seed_cmd failed to compile.")
+        except KeyError:
+            styled_print.error("Please enter in a seed_cmd")
 
 
 class Handler(FileSystemEventHandler):
@@ -43,9 +58,12 @@ class Handler(FileSystemEventHandler):
         except:
             ignored = False
 
+        if event.src_path.split("/")[-1] == ".berryrc":
+            last_event["message"] = True
+
         if not ignored:
             last_event["time"] = datetime.now()
-            thread = threading.Thread(target=thread_compile, args=(event,))
+            thread = threading.Thread(target=thread_compile)
             thread.start()
 
 

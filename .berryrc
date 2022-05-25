@@ -3,7 +3,7 @@
     "berry_type": "packed",
     "build_cmd": "strawberry build -o @prod_dir",
     "dev_cmd": "strawberry dev",
-    "seed_cmd": "go . -o @dev_dir/tablespoon",
+    "seed_cmd": "go build . -o @dev_dir/tablespoon",
     "hot_reload": true,
     "advanced": {
         "dev_branch":  "-dev",
