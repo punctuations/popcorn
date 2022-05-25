@@ -23,7 +23,7 @@ def thread_compile(event):
 
     event_time_remaining = last_event["time"] + event_delta - datetime.now()
     if event_time_remaining.days <= -1:
-        print(f"compile {event.src_path}")
+        styled_print.info(f"compiling {event.src_path}")
 
 
 class Handler(FileSystemEventHandler):
