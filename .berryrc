@@ -1,12 +1,12 @@
 {
-    "berry_name": "tablespoon",
+    "berry_name": "strawberry",
     "berry_type": "packed",
     "build_cmd": "strawberry build -o @prod_dir",
     "dev_cmd": "strawberry dev",
-    "seed_cmd": "go build . -o @dev_dir/tablespoon",
+    "seed_cmd": "cp -r * @dev_dir",
     "hot_reload": true,
     "advanced": {
         "dev_branch":  "-dev",
-        "prod_dir": "@home_dir/.local/bin"
+        "prod_dir": "@HOME_DIR/.local/bin"
     }
 }

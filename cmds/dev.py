@@ -1,9 +1,11 @@
 import json
 import os
+import shutil
 import subprocess
 import sys
 import threading
 import time
+import re
 from datetime import timedelta, datetime
 
 from watchdog.events import FileSystemEventHandler
@@ -31,8 +33,18 @@ def thread_compile():
         if last_event["message"]:
             styled_print.info("Updates to config detected, to see up-to-date changes re-run this command.")
         styled_print.event("Received compile event.")
+
         try:
-            exit_status = os.WEXITSTATUS(os.system(config["seed_cmd"]))
+            try:
+                shutil.rmtree(f"{DEV_DIR}{os.sep}")
+                os.mkdir(DEV_DIR)
+            except FileExistsError:
+                pass
+            except FileNotFoundError:
+                pass
+
+            seed_cmd = re.compile(re.escape("@dev_dir"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
+            exit_status = os.WEXITSTATUS(os.system(seed_cmd))
             if exit_status == 0:
                 styled_print.success("Compiled successfully.")
             else:
@@ -72,10 +84,16 @@ def dev(args):
     has_listen_flag = [element for element in listen if (element in args)]
     listen_index = args.index(has_listen_flag[0]) if len(has_listen_flag) >= 1 else 0
 
-    # check if DEV_DIR exists, if not generate the dir using seed_cmd
     # initialize development env
-    if not os.path.exists(DEV_DIR):
-        styled_print.info("running seed_cmd")
+    shutil.rmtree(DEV_DIR, ignore_errors=True)
+    os.mkdir(DEV_DIR)
+
+    seed_cmd = re.compile(re.escape("@dev_dir"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
+    exit_status = os.WEXITSTATUS(os.system(seed_cmd))
+    if exit_status == 0:
+        styled_print.success("Compiled successfully.")
+    else:
+        styled_print.error("seed_cmd failed to compile.")
 
     if has_listen_flag:
         try:
@@ -101,10 +119,14 @@ def dev(args):
 
     # Start the observer
     observer.start()
+    os.environ["PATH"] += os.pathsep + DEV_DIR
+    print(os.environ["PATH"])
     try:
         while True:
             # Set the thread sleep time
             time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
+    finally:
+        os.environ["PATH"] = os.environ["PATH"].replace(os.pathsep + DEV_DIR, "")
     observer.join()
