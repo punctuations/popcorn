@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import threading
@@ -23,6 +24,8 @@ event_delta = timedelta(seconds=int(2))
 f = open("./.berryrc")
 config = json.load(f)
 f.close()
+
+berry_name = config["berry_name"]
 
 rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
 profile = f"{os.environ['HOME']}{os.sep}.profile"
@@ -48,6 +51,10 @@ def thread_compile():
 
             seed_cmd = re.compile(re.escape("@dev_dir"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
             exit_status = os.WEXITSTATUS(os.system(seed_cmd))
+            try:
+                os.chmod(os.path.join(DEV_DIR, berry_name), stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
+            except FileNotFoundError:
+                styled_print.error("Unable to amend permission of file.")
             if exit_status == 0:
                 styled_print.success("Compiled successfully.")
             else:
@@ -86,6 +93,10 @@ class Handler(FileSystemEventHandler):
 def dev(args):
     has_listen_flag = [element for element in listen if (element in args)]
     listen_index = args.index(has_listen_flag[0]) if len(has_listen_flag) >= 1 else 0
+
+    if not berry_name:
+        styled_print.error("Please enter a berry_name in config.")
+        sys.exit(0)
 
     # initialize development env
     shutil.rmtree(DEV_DIR, ignore_errors=True)
