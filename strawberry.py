@@ -60,13 +60,9 @@ def strawberry(command):
                 run_build([command[0]])
         else:
             # command is: strawberry
-            # * Run build command with .berryrc options
-            run_build = getattr(cmds["build"], "build")
-            try:
-                build_command = config["build_cmd"]
-                os.system(build_command)
-            except KeyError:
-                run_build(["."])
+            # * Run install command
+            run_install = getattr(cmds["install"], "install")
+            run_install([])
 
 
 if __name__ == '__main__':

@@ -24,6 +24,9 @@ f = open("./.berryrc")
 config = json.load(f)
 f.close()
 
+rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
+profile = f"{os.environ['HOME']}{os.sep}.profile"
+
 
 def thread_compile():
     time.sleep(2)
@@ -119,14 +122,10 @@ def dev(args):
 
     # Start the observer
     observer.start()
-    os.environ["PATH"] += os.pathsep + DEV_DIR
-    print(os.environ["PATH"])
     try:
         while True:
             # Set the thread sleep time
             time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
-    finally:
-        os.environ["PATH"] = os.environ["PATH"].replace(os.pathsep + DEV_DIR, "")
     observer.join()
