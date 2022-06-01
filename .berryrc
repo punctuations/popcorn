@@ -1,10 +1,10 @@
 {
     "berry_name": "strawberry",
-    "berry_type": "packed",
+    "berry_type": "unpacked",
+    "packed_stem": "python strawberry.py @args",
     "build_cmd": "strawberry build -o @prod_dir",
     "dev_cmd": "strawberry dev",
     "seed_cmd": "cp -r * @dev_dir",
-    "hot_reload": true,
     "advanced": {
         "dev_branch":  "-dev",
         "prod_dir": "@HOME_DIR/.local/bin"
