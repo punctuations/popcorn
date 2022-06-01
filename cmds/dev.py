@@ -57,12 +57,12 @@ def thread_compile():
             try:
                 if berry_type.lower() == "unpacked":
                     try:
-                        packed_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["packed_stem"])
+                        unpacked_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
                         with open(f"{DEV_DIR}{os.sep}{berry_name}", "w") as berry:
-                            berry.write(f"#!/bin/bash\n{packed_stem}")
+                            berry.write(f"#!/bin/bash\n{unpacked_stem}")
                             berry.close()
                     except KeyError:
-                        styled_print.error("Please include the packed_stem in the config.")
+                        styled_print.error("Please include the unpacked_stem in the config.")
                         berry.close()
                         sys.exit(0)
 
@@ -132,12 +132,50 @@ def dev(args):
     shutil.rmtree(DEV_DIR, ignore_errors=True)
     os.mkdir(DEV_DIR)
 
-    seed_cmd = re.compile(re.escape("@dev_dir"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
-    exit_status = os.WEXITSTATUS(os.system(seed_cmd))
-    if exit_status == 0:
-        styled_print.success("Compiled successfully.")
-    else:
-        styled_print.error("seed_cmd failed to compile.")
+    try:
+        seed_cmd = re.compile(re.escape("@dev_dir"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
+        exit_status = os.WEXITSTATUS(os.system(seed_cmd))
+
+        # create packed berry.
+        try:
+            if berry_type.lower() == "unpacked":
+                try:
+                    unpacked_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
+                    with open(f"{DEV_DIR}{os.sep}{berry_name}", "w") as berry:
+                        berry.write(f"#!/bin/bash\n{unpacked_stem}")
+                        berry.close()
+                except KeyError:
+                    styled_print.error("Please include the unpacked_stem in the config.")
+                    berry.close()
+                    sys.exit(0)
+
+        except KeyError:
+            styled_print.error("Please include the berry_type in the config.")
+            sys.exit(0)
+
+        # edit permissions to all
+        try:
+            os.chmod(os.path.join(DEV_DIR, berry_name), stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
+        except FileNotFoundError:
+            styled_print.error("Unable to amend permission of file; file not found.")
+            sys.exit(0)
+
+        if exit_status == 0:
+            styled_print.success("Compiled successfully.")
+        else:
+            styled_print.error("Failed to compile, please check seed_cmd.")
+
+    except KeyError:
+        styled_print.error("Please enter in a seed_cmd")
+        sys.exit(0)
+
+    # rename berry to dev branch.
+    try:
+        os.rename(f"{DEV_DIR}{os.sep}{berry_name}",
+                  f"{DEV_DIR}{os.sep}{berry_name}{config['advanced']['dev_branch'] if config['advanced']['dev_branch'] else '-dev'}")
+    except FileNotFoundError:
+        styled_print.error(f"Please have a file named {berry_name} as entry point.")
+        sys.exit(0)
 
     if has_listen_flag:
         try:
