@@ -18,6 +18,11 @@ except FileNotFoundError:
 
 # strawberry install
 def install(args):
+    """
+    Used to initialize environment for berries.
+
+    :param args: arguments passed to command.
+    """
     dev = ["-d", "--dev"]
     has_dev_flag = [element for element in dev if (element in args)]
 

@@ -9,6 +9,11 @@ PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
 
 # strawberry remove
 def remove(args):
+    """
+    Used to remove both production berries and development berries.
+
+    :param args: arguments passed to command
+    """
     dev = ["-d", "--dev"]
     has_dev_flag = [element for element in dev if (element in args)]
 

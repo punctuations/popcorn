@@ -126,6 +126,11 @@ class Handler(FileSystemEventHandler):
 
 # strawberry dev
 def dev(args):
+    """
+    Used to create development berries.
+
+    :param args: arguments passed to command
+    """
     has_listen_flag = [element for element in listen if (element in args)]
     listen_index = args.index(has_listen_flag[0]) if len(has_listen_flag) >= 1 else 0
 

@@ -3,6 +3,11 @@ import os
 
 
 def init(args):
+    """
+    Used to initialize a .berryrc configuration file.
+
+    :param args: arguments passed to command
+    """
     force = ['--force']
     packed = ['-p', '--packed']
 

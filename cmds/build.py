@@ -139,6 +139,11 @@ def build_thread(output):
 
 # strawberry build
 def build(args):
+    """
+    Used to create production-level berries.
+
+    :param args: arguments passed to command
+    """
     output = ["-o", "--output"]
     # when file is placed here make sure to set path variable to file containing accessible target
     # ex. (unpacked) export PATH = $PATH:$HOME/.local/bin/strawberry
