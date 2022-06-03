@@ -105,6 +105,28 @@ The dev flag is used to indicate the requested berry is a development berry, whi
 > strawberry remove foo -d
 ```
 
+##### Init:
+The init command initializes the config file for strawberry.
+
+```
+> strawberry init
+```
+
+force flag:
+
+The force flag will replace any existing config file with the base/skeleton one.
+
+```
+> strawberry init --force
+```
+
+packed flag:
+
+The packed flag generates a different skeleton to that of the unpacked or default one and will only have necessary values.
+````
+> strawberry init --packed
+````
+
 #### [Back to contents](#contents)
 
 ### Config
