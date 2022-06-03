@@ -27,8 +27,8 @@ def install(args):
         styled_print.error("Please include a berry_name in config.")
         sys.exit(0)
 
-    if not os.path.exists(f'{PROD_DIR}{os.sep}.berries{os.sep}pits.sh'):
-        with open(f'{PROD_DIR}{os.sep}.berries{os.sep}pits.sh', "w") as pit:
+    if not os.path.exists(f'{PROD_DIR}{os.sep}pits.sh'):
+        with open(f'{PROD_DIR}{os.sep}pits.sh', "w") as pit:
             pit.write("#!/bin/bash\n")
             pit.close()
 
@@ -74,6 +74,7 @@ def install(args):
                 shellrc.write(f"\n. $HOME{os.sep}.berries{os.sep}pits.sh\n{rclines}")
                 shellrc.close()
             else:
+                styled_print.info("Berry already installed.")
                 shellrc.close()
         else:
             profile = open(dotprofile, "r+")
@@ -84,5 +85,6 @@ def install(args):
                 profile.truncate()
                 profile.close()
             else:
+                styled_print.info("Berry already installed.")
                 profile.close()
 
