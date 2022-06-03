@@ -1,4 +1,6 @@
 # 🍓 strawberry
+### Say goodbye to complicated installation instructions and build steps.
+
 ![](demo.gif)
 
 ## Contents
