@@ -15,6 +15,7 @@
 - python 3.6.8+
 - pip
 - git (only for install.sh script)
+- bash
 
 #### [Back to contents](#contents)
 
