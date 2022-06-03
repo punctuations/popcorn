@@ -1,12 +1,10 @@
 {
     "berry_name": "strawberry",
     "berry_type": "unpacked",
-    "unpacked_stem": "python strawberry.py @args",
-    "build_cmd": "strawberry build -o @prod_dir",
+    "unpacked_stem": "python @local/strawberry.py @args",
     "dev_cmd": "strawberry dev",
-    "seed_cmd": "cp -r * @dev_dir",
+    "seed_cmd": "cp -r * @dest",
     "advanced": {
-        "dev_branch":  "-dev",
-        "prod_dir": "@HOME_DIR/.local/bin"
+        "dev_branch":  "-dev"
     }
 }

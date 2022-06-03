@@ -8,9 +8,11 @@ alias = ["-a", "--alias"]
 dev = ["-d", "--dev"]
 debug = ["--debug"]
 
+ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 
 def load_cmds():
-    cmds = os.listdir("cmds")  # get all files in /cmds
+    cmds = os.listdir(f"{ROOT_DIR}{os.sep}cmds")  # get all files in /cmds
     cmds = [s for s in cmds if s[0] not in "_."]  # remove hidden files
     cmds = [s[:-3] for s in cmds]  # remove '.py'
     cmds_dict = {}  # init cmds_dict
@@ -57,7 +59,7 @@ def strawberry(command):
             except KeyError:
                 # command is: strawberry /path/to/files
                 run_build = getattr(cmds["build"], "build")
-                run_build([command[0]])
+                run_build(command)
         else:
             # command is: strawberry
             # * Run install command

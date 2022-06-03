@@ -21,9 +21,13 @@ DEV_DIR = f"{os.path.realpath(os.getcwd())}{os.sep}.strawberry"
 last_event = {"message": False}
 event_delta = timedelta(seconds=int(2))
 
-f = open("./.berryrc")
-config = json.load(f)
-f.close()
+try:
+    f = open("./.berryrc")
+    config = json.load(f)
+    f.close()
+except FileNotFoundError:
+    styled_print.error("Please create a .berryrc file.")
+    sys.exit(0)
 
 berry_name = config["berry_name"]
 berry_type = config["berry_type"]
@@ -50,14 +54,15 @@ def thread_compile():
             except FileNotFoundError:
                 pass
 
-            seed_cmd = re.compile(re.escape("@dev_dir"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
+            seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
             exit_status = os.WEXITSTATUS(os.system(seed_cmd))
 
-            # create packed berry.
+            # create unpacked berry.
             try:
                 if berry_type.lower() == "unpacked":
                     try:
-                        unpacked_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
+                        arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
+                        unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE).sub(DEV_DIR, arg_stem)
                         with open(f"{DEV_DIR}{os.sep}{berry_name}", "w") as berry:
                             berry.write(f"#!/bin/bash\n{unpacked_stem}")
                             berry.close()
@@ -133,14 +138,15 @@ def dev(args):
     os.mkdir(DEV_DIR)
 
     try:
-        seed_cmd = re.compile(re.escape("@dev_dir"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
+        seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(DEV_DIR, config["seed_cmd"])
         exit_status = os.WEXITSTATUS(os.system(seed_cmd))
 
         # create packed berry.
         try:
             if berry_type.lower() == "unpacked":
                 try:
-                    unpacked_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
+                    arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
+                    unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE).sub(DEV_DIR, arg_stem)
                     with open(f"{DEV_DIR}{os.sep}{berry_name}", "w") as berry:
                         berry.write(f"#!/bin/bash\n{unpacked_stem}")
                         berry.close()
