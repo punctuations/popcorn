@@ -20,7 +20,7 @@
 
 ### Install
 
-Linux:
+Linux/Mac:
 ```bash
 curl -sSL https://cmdf.at/strawberry | bash
 ```
