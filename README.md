@@ -111,6 +111,7 @@ The dev flag is used to indicate the requested berry is a development berry, whi
 ##### Init:
 The init command initializes the config file for strawberry.
 
+Ex.
 ```
 > strawberry init
 ```
