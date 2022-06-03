@@ -80,7 +80,7 @@ The install command is to install your berry to the path and initialize the envi
 
 Ex.
 ```
-strawberry install
+> strawberry install
 ```
 
 dev flag:
