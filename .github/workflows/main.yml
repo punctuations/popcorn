@@ -15,6 +15,3 @@ jobs:
         flake8-flags: '--max-line-length 120'
         mypy-flags: '--ignore-missing-imports'
         fail-on-isort: true
-
-    - name: Codecov
-      uses: codecov/codecov-action@v3.1.0

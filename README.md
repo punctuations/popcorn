@@ -12,7 +12,7 @@
 - [Config](#config)
 
 ### Requirements
-- python 3.6.8+
+- python 3.7+
 - pip
 - git (only for install.sh script)
 - bash
