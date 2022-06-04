@@ -53,7 +53,7 @@ def build_thread(output):
         # create unpacked berry.
         if berry_type.lower() == "unpacked":
             try:
-                arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
+                arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_stem"])
                 unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE)\
                     .sub(f"{PROD_DIR}{os.sep}{output[:-1] if output.endswith('/') else output}", arg_stem)
                 with open(f"{PROD_DIR}{os.sep}{output}{berry_name}", "w") as berry:

@@ -23,10 +23,8 @@ def remove(args):
         styled_print.info(f"Removing {args[0]}...")
         if f"{args[0]}{os.sep}.strawberry" in path:
             if os.name == 'nt':
-                split_paths = path.split(os.pathsep)
-                removed_berry = f'{args[0]}{os.sep}.strawberry'
                 os.system(
-                    f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_berry not in i])}'")
+                    f"setx PATH '{f'{os.pathsep}'.join([i for i in path.split(os.pathsep) if f'{args[0]}{os.sep}.strawberry' not in i])}'")
             else:
                 if has_dev_flag:
                     rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"

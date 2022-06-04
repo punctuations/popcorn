@@ -12,7 +12,7 @@ jobs:
       uses: programmingwithalex/pylinters@v1.4.2
       with:
         python-root: '.'
-        flake8-flags: ''
+        flake8-flags: '--max-line-length 120'
         mypy-flags: ''
         fail-on-isort: false
 

@@ -61,7 +61,7 @@ def thread_compile():
             try:
                 if berry_type.lower() == "unpacked":
                     try:
-                        arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
+                        arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_stem"])
                         unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE).sub(DEV_DIR, arg_stem)
                         with open(f"{DEV_DIR}{os.sep}{berry_name}", "w") as berry:
                             berry.write(f"#!/bin/bash\n{unpacked_stem}")
@@ -153,7 +153,7 @@ def dev(args):
         try:
             if berry_type.lower() == "unpacked":
                 try:
-                    arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
+                    arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_stem"])
                     unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE).sub(DEV_DIR, arg_stem)
                     with open(f"{DEV_DIR}{os.sep}{berry_name}", "w") as berry:
                         berry.write(f"#!/bin/bash\n{unpacked_stem}")
