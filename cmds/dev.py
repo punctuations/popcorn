@@ -92,7 +92,10 @@ def thread_compile():
 
         # rename berry to dev branch.
         try:
-            os.rename(f"{DEV_DIR}{os.sep}{berry_name}", f"{DEV_DIR}{os.sep}{berry_name}{config['advanced']['dev_branch'] if config['advanced']['dev_branch'] else '-dev'}")
+            dev_branch = config['advanced']['dev_branch']
+
+            os.rename(f"{DEV_DIR}{os.sep}{berry_name}",
+                      f"{DEV_DIR}{os.sep}{berry_name}{config['advanced']['dev_branch'] if dev_branch else '-dev'}")
         except FileNotFoundError:
             styled_print.error(f"Please have a file named {berry_name} as entry point.")
             sys.exit(0)
@@ -112,7 +115,7 @@ class Handler(FileSystemEventHandler):
                 ignored = False
             else:
                 ignored = True
-        except:
+        except subprocess.CalledProcessError:
             ignored = False
 
         if event.src_path.split("/")[-1] == ".berryrc":
@@ -182,8 +185,9 @@ def dev(args):
 
     # rename berry to dev branch.
     try:
+        dev_branch = config['advanced']['dev_branch']
         os.rename(f"{DEV_DIR}{os.sep}{berry_name}",
-                  f"{DEV_DIR}{os.sep}{berry_name}{config['advanced']['dev_branch'] if config['advanced']['dev_branch'] else '-dev'}")
+                  f"{DEV_DIR}{os.sep}{berry_name}{config['advanced']['dev_branch'] if dev_branch else '-dev'}")
     except FileNotFoundError:
         styled_print.error(f"Please have a file named {berry_name} as entry point.")
         sys.exit(0)

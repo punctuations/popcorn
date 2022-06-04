@@ -44,7 +44,8 @@ def build_thread(output):
                 os.mkdir(f"{PROD_DIR}{os.sep}{output}")
             except FileExistsError:
                 pass
-            seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(f"{PROD_DIR}{os.sep}{output}", config["seed_cmd"])
+            seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE)\
+                .sub(f"{PROD_DIR}{os.sep}{output}", config["seed_cmd"])
         else:
             seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(f"{PROD_DIR}", config["seed_cmd"])
         exit_status = os.WEXITSTATUS(os.system(seed_cmd))
@@ -53,7 +54,8 @@ def build_thread(output):
         if berry_type.lower() == "unpacked":
             try:
                 arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub(f"\"$@\"", config["unpacked_stem"])
-                unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE).sub(f"{PROD_DIR}{os.sep}{output[:-1] if output.endswith('/') else output}", arg_stem)
+                unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE)\
+                    .sub(f"{PROD_DIR}{os.sep}{output[:-1] if output.endswith('/') else output}", arg_stem)
                 with open(f"{PROD_DIR}{os.sep}{output}{berry_name}", "w") as berry:
                     berry.write(f"#!/bin/bash\n{unpacked_stem}")
                     berry.close()
@@ -63,7 +65,8 @@ def build_thread(output):
                 sys.exit(0)
 
         try:
-            os.chmod(os.path.join(PROD_DIR, output if berry_type.lower() == "packed" else f"{output}{berry_name}"), stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
+            os.chmod(os.path.join(PROD_DIR, output if berry_type.lower() == "packed" else f"{output}{berry_name}"),
+                     stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
         except FileNotFoundError:
             styled_print.error("Unable to amend permission of file; file not found.")
             sys.exit(0)

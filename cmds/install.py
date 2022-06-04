@@ -92,4 +92,3 @@ def install(args):
             else:
                 styled_print.info("Berry already installed.")
                 profile.close()
-
