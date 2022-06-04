@@ -1,13 +1,13 @@
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
 import sys
 import threading
 import time
-import re
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
