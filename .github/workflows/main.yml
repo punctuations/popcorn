@@ -13,7 +13,7 @@ jobs:
       with:
         python-root: '.'
         flake8-flags: '--max-line-length 120'
-        mypy-flags: ''
+        mypy-flags: '--ignore-missing-imports'
         fail-on-isort: false
 
     - name: commit isort changes
