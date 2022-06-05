@@ -1,6 +1,8 @@
 import json
 import os
 
+from _utils import styled_print
+
 
 # strawberry help
 def help(args):
@@ -14,25 +16,45 @@ def help(args):
     blame = json.load(f)
     f.close()
 
-    command_list = os.listdir(path=os.path.dirname(os.path.realpath(__file__)))
+    if len(args) < 1:
+        command_list = os.listdir(path=os.path.dirname(os.path.realpath(__file__)))
 
-    commands = []
-    definitions = []
+        commands = []
+        definitions = []
 
-    for file in command_list:
-        if not file.startswith("_"):
-            commands.append(file.split(".")[0])
+        for file in command_list:
+            if not file.startswith("_"):
+                commands.append(file.split(".")[0])
 
-    for file in commands:
-        with open(f"{os.path.dirname(os.path.realpath(__file__))}{os.sep}{file}.py", "r") as f:
-            contents = f.read()
-            definitions.append(contents.split("\"\"\"")[1].split(":")[0])
-            f.close()
+        for file in commands:
+            with open(f"{os.path.dirname(os.path.realpath(__file__))}{os.sep}{file}.py", "r") as f:
+                contents = f.read()
+                definitions.append(contents.split("\"\"\"")[1].split(":")[0])
+                f.close()
 
-    print(f"\n \u001b[41;5;1m {blame['name']} \u001b[0;0m v\u001b[38;5;48m{blame['version']}\u001b[0;0m")
-    print(f"\n\u001b[38;5;8m  💻 {blame['source']}\u001b[0;0m")
-    print("\n\u001b[38;5;13m ### Description \033[0;0m\n")
-    print(f"  {blame['description']}")
-    print("\n\u001b[38;5;13m ### Commands \033[0;0m\n")
-    for i, command in enumerate(commands):
-        print(f"  \u001b[38;5;4m {command} \u001b[0;0m> {' '.join(definitions[i].split())}")
+        print(f"\n \u001b[41;5;1m {blame['name']} \u001b[0;0m v\u001b[38;5;48m{blame['version']}\u001b[0;0m")
+        print(f"\n\u001b[38;5;8m  💻 {blame['source']}\u001b[0;0m")
+        print("\n\u001b[38;5;13m ### Description \033[0;0m\n")
+        print(f"  {blame['description']}")
+        print("\n\u001b[38;5;13m ### Commands \033[0;0m\n")
+        for i, command in enumerate(commands):
+            print(f"  • \u001b[38;5;4m {command} \u001b[0;0m> {' '.join(definitions[i].split())}")
+    else:
+        command_file = f"{os.path.dirname(os.path.realpath(__file__))}{os.sep}{args[0]}.py"
+        if os.path.exists(command_file):
+            command = open(command_file, "r")
+            contents = command.read()
+            command.close()
+            command_desc = contents.split('\"\"\"\n')[1].split("\n")[0]
+
+            print(f"\n \u001b[41;5;1m {blame['name']} \u001b[0;0m v\u001b[38;5;48m{blame['version']}\u001b[0;0m")
+            print(f"\n\u001b[38;5;8m  💻 {blame['source']}\u001b[0;0m")
+            print("\n\u001b[38;5;13m ### Usage \033[0;0m\n")
+            print(f"  {command_desc}")
+            print("\n\u001b[38;5;13m ### Flags \033[0;0m\n")
+            for flags in contents.split("# flags: ")[1].split("\n")[0].split(";"):
+                flag = flags.split(":")[0]
+                flag_desc = flags.split(":")[1].split("\n")[0]
+                print(f"  • \u001b[38;5;4m {flag} \u001b[0;0m> {flag_desc}")
+        else:
+            styled_print.error("Command not found")

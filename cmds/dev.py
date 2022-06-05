@@ -128,6 +128,7 @@ class Handler(FileSystemEventHandler):
 
 
 # strawberry dev
+# flags: -l, --listen: set the dir/file that is being watched for changes
 def dev(args):
     """
     Used to create development berries.

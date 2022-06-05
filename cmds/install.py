@@ -17,6 +17,7 @@ except FileNotFoundError:
 
 
 # strawberry install
+# flags: -d, --dev: install development berries
 def install(args):
     """
     Used to initialize environment for berries.

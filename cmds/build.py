@@ -141,6 +141,7 @@ def build_thread(output):
 
 
 # strawberry build
+# flags: -o, --output: change the output directory of the berry
 def build(args):
     """
     Used to create production-level berries.
