@@ -131,6 +131,15 @@ The packed flag generates a different skeleton to that of the unpacked or defaul
 > strawberry init --packed
 ````
 
+
+##### Help:
+The help command provides help for the commands, providing more detail about them.
+
+Ex.
+```
+> strawberry help dev
+```
+
 #### [Back to contents](#contents)
 
 ### Config
