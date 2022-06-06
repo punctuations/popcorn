@@ -1,6 +1,7 @@
-on: [push, pull_request]
-  tags:
-  - 'v*'
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   name: Compile to executables
