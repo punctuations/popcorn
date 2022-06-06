@@ -1,11 +1,12 @@
-on: ['push']
+on: ['push', 'pull_request']
 
 jobs:
-  create_release:
+  release:
     name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Create release
+      - id: create_release
       - uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,4 +52,3 @@ jobs:
           asset_path: ./dist/strawberry
           asset_name: strawberry
           asset_content_type: application/x-executable
-
