@@ -11,8 +11,20 @@ debug = ["--debug"]
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 def load_cmds():
-    cmds = os.listdir(f"{ROOT_DIR}{os.sep}cmds")  # get all files in /cmds
+    print(os.listdir(ROOT_DIR))
+    cmds = os.listdir(resource_path("cmds"))  # get all files in /cmds
     cmds = [s for s in cmds if s[0] not in "_."]  # remove hidden files
     cmds = [s[:-3] for s in cmds]  # remove '.py'
     cmds_dict = {}  # init cmds_dict

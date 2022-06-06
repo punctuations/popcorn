@@ -2,5 +2,13 @@
 .idea
 .vscode
 
+# python
+**/__pycache__
+venv
+
+# pyinstaller
+build
+dist
+
 # internal
 .strawberry
