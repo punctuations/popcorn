@@ -1,7 +1,9 @@
-on:
-  push:
-    tags:
-      - 'v*'
+#on:
+#  push:
+#    tags:
+#      - 'v*'
+
+on: ['push']
 
 jobs:
   compile_exec:
@@ -25,7 +27,7 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
       - name: Build with pyinstaller for ${{ matrix.config.os }}
-        run: pyinstaller.spec
+        run: pyinstaller strawberry.spec
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
