@@ -1,14 +1,10 @@
-on:
-  push:
-    tags:
-      - "**"
-    tags-ignore:
-      - 'v*'
+on: ['push', 'pull_request']
 
 jobs:
   compile_exec:
     name: Compile to executables
     runs-on: ${{ matrix.config.os }}
+    if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
         config:
