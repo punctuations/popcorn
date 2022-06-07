@@ -4,8 +4,6 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Create release
         id: create_release
@@ -21,11 +19,11 @@ jobs:
             <sub>This release is automatically generated.</sub>
           draft: false
           prerelease: false
-      - name: debug
-        run: |
-          echo ${{ join(steps.create_release.outputs.*, '\n') }}
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
 
   compile_exec:
+    needs: ['release']
     name: Compile to executables
     runs-on: ${{ matrix.config.os }}
     strategy:
