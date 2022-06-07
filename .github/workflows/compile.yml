@@ -14,13 +14,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: ${{ github.ref }}
           body: |
-            ## 🎉 v${{ github.ref}} is now released!
+            ## 🎉 ${{ github.ref }} is now released!
             
             <sub>This release is automatically generated.</sub>
           draft: false
           prerelease: false
+      - name: debug
+        run: |
+          echo ${{ steps.create_release.outputs.upload_url }}
 
   compile_exec:
     name: Compile to executables
