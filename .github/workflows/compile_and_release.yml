@@ -41,6 +41,9 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: '3.9'
+        run: |
+          echo ${{ matrix.os }}
+          echo ${{ matrix.os }} vs 'windows.latest'
       - name: Install dependencies for ${{ matrix.config.os }}
         run: |
           python -m pip install --upgrade pip wheel setuptools
@@ -49,8 +52,6 @@ jobs:
       - name: Build with pyinstaller for ${{ matrix.config.os }}
         run: pyinstaller strawberry.spec
       - name: Upload Release Asset
-        run: |
-          echo ${{matrix.os}}
         if: ${{ matrix.os != 'windows-latest' }}
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
@@ -62,8 +63,6 @@ jobs:
           asset_name: strawberry-${{ matrix.config.os }}
           asset_content_type: application/x-executable
       - name: Upload Release Asset Windows
-        run: |
-          echo ${{matrix.os}}
         if: ${{ matrix.os == 'windows-latest' }}
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
