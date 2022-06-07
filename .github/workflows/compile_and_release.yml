@@ -37,13 +37,14 @@ jobs:
           - os: windows-latest
     steps:
       - uses: actions/checkout@v3
+      - name: debug
+        run: |
+          echo ${{ matrix.os }}
+          echo ${{ matrix.os }} vs 'windows.latest'
       - name: Setup python
         uses: actions/setup-python@v3
         with:
           python-version: '3.9'
-        run: |
-          echo ${{ matrix.os }}
-          echo ${{ matrix.os }} vs 'windows.latest'
       - name: Install dependencies for ${{ matrix.config.os }}
         run: |
           python -m pip install --upgrade pip wheel setuptools
