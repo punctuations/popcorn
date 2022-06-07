@@ -36,6 +36,8 @@ jobs:
           - os: windows-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Debug
+        run: echo ${{ needs.release.outputs.upload_url }}
       - name: Setup python
         uses: actions/setup-python@v3
         with:
