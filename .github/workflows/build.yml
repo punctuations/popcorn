@@ -1,0 +1,28 @@
+on:
+  push:
+    tags-ignore:
+      - 'v*'
+
+jobs:
+  compile_exec:
+    name: Compile to executables
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - os: ubuntu-latest
+          - os: macos-latest
+          - os: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+      - name: Install dependencies for ${{ matrix.config.os }}
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+          pip install -r requirements.txt
+          pip install pyinstaller
+      - name: Build with pyinstaller for ${{ matrix.config.os }}
+        run: pyinstaller strawberry.spec
