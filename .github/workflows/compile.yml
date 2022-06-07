@@ -23,7 +23,7 @@ jobs:
           prerelease: false
       - name: debug
         run: |
-          echo ${{ steps.create_release.outputs.upload_url }}
+          echo ${{ join(steps.create_release.outputs.*, '\n') }}
 
   compile_exec:
     name: Compile to executables
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Debug
         run: |
-          echo ${{ needs.release.outputs.upload_url }}
+          echo ${{ join(needs.release.outputs.*, '\n') }}
       - name: Setup python
         uses: actions/setup-python@v3
         with:
