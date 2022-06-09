@@ -11,11 +11,7 @@ jobs:
       - name: Commits since last release
         id: commits
         run: |
-          git clone https://github.com/punctuations/strawberry ./tmp/
-          cd tmp
-          echo "::set-output name=commits::$(git log $(git describe --tags --abbrev=0)..HEAD --oneline)"
-          cd ..
-          rm -rf ./tmp
+          git clone https://github.com/punctuations/strawberry ./tmp/ && cd tmp && echo "::set-output name=commits::$(git log $(git describe --tags --abbrev=0)..HEAD --oneline)" && cd .. && rm -rf ./tmp
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -25,7 +21,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
           body: |
-            ## Changelog:
+            ## 📋 Changelog:
             ${{ steps.commits.outputs.commits }}
             
             <sub>This release is automatically generated.</sub>
