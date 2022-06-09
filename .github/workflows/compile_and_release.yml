@@ -11,7 +11,11 @@ jobs:
       - name: Commits since last release
         id: commits
         run: |
+          git clone https://github.com/punctuations/strawberry ./tmp/
+          cd tmp
           echo "::set-output name=commits::$(git log $(git describe --tags --abbrev=0)..HEAD --oneline)"
+          cd ..
+          rm -rf ./tmp
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
