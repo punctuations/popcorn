@@ -32,7 +32,7 @@ def help(args):
                 definitions.append(contents.split("\"\"\"")[1].split(":")[0])
                 f.close()
 
-        print(f"\n \u001b[41;5;1m {blame['name']} \u001b[0;0m v\u001b[38;5;48m{blame['version']}\u001b[0;0m")
+        print(f"\n \u001b[41;1;1m {blame['name']} \u001b[0;0m v\u001b[38;5;48m{blame['version']}\u001b[0;0m")
         print(f"\n\u001b[38;5;8m  💻 {blame['source']}\u001b[0;0m")
         print("\n\u001b[38;5;13m ### Description \033[0;0m\n")
         print(f"  {blame['description']}")
