@@ -5,6 +5,7 @@
 
 ## Contents
 - [Requirements](#requirements)
+- [Terminology](#terminology)
 - [Installation](#install)
 - [Updating](#updating)
 - [How it works](#how-it-works)
@@ -16,6 +17,12 @@
 - pip
 - git (only for install.sh script)
 - bash
+
+#### [Back to contents](#contents)
+
+### Terminology
+
+- placeholder
 
 #### [Back to contents](#contents)
 
