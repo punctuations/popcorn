@@ -8,6 +8,10 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
+      - name: Commits since last release
+        id: commits
+        run: |
+          echo "::set-output name=commits::$(git log $(git describe --tags --abbrev=0)..HEAD --oneline)"
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -17,7 +21,8 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
           body: |
-            ## 🎉 ${{ github.ref }} is now released!
+            ## Changelog:
+            ${{ steps.commits.outputs.commits }}
             
             <sub>This release is automatically generated.</sub>
           draft: false
@@ -37,6 +42,8 @@ jobs:
           - os: windows-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # [!] we need to checkout with tags and commit history
       - name: Setup python
         uses: actions/setup-python@v3
         with:
