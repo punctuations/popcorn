@@ -55,6 +55,18 @@ jobs:
           pip install pyinstaller
       - name: Build with pyinstaller for ${{ matrix.config.os }}
         run: pyinstaller blueberry.spec
+      - name: Copy files to be compressed
+        if: ${{ matrix.config.os != 'windows-latest' }}
+        run: |
+          cp README.md ./dist
+          cp LICENSE ./dist
+      - name: Archive Files
+        if: ${{ matrix.config.os != 'windows-latest' }}
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'tar'
+          path: './dist'
+          filename: 'blueberry.tar.gz'
       - name: Upload Release Asset
         if: ${{ matrix.config.os != 'windows-latest' }}
         id: upload-release-asset 
@@ -63,9 +75,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./dist/blueberry
-          asset_name: blueberry-${{ matrix.config.os }}
-          asset_content_type: application/x-executable
+          asset_path: ./blueberry.tar.gz
+          asset_name: blueberry-${{ matrix.config.os }}.tar.gz
+          asset_content_type: application/gzip
       - name: Upload Release Asset Windows
         if: ${{ matrix.config.os == 'windows-latest' }}
         id: upload-release-asset-windows
