@@ -17,7 +17,6 @@ except FileNotFoundError:
 
 
 # blueberry install
-# flags: -d, --dev: install development berries
 def install(args):
     """
     Used to initialize environment for berries.

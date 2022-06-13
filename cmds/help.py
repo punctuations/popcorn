@@ -4,7 +4,7 @@ import os
 from _utils import styled_print
 
 
-# strawberry help
+# blueberry help
 def help(args):
     """
     Used to get more information about commands.

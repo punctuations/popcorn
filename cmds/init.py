@@ -5,16 +5,16 @@ def create_config(has_packed):
     with open('.berryrc', "w") as config:
         if has_packed:
             config.write(f"{{\n'berry_name': '{os.getcwd().split(os.sep)[-1]}',\n'berry_type': 'packed',"
-                         f"\n'dev_cmd': 'strawberry dev',\n'seed_cmd': 'go build -o @dest',\n'advanced': {{"
+                         f"\n'dev_cmd': 'blueberry dev',\n'seed_cmd': 'go build -o @dest',\n'advanced': {{"
                          f"\n'dev_branch':  '-dev'\n}}\n}}")
         else:
             config.write(f"{{\n'berry_name': '{os.getcwd().split(os.sep)[-1]}',\n'berry_type': 'unpacked',"
-                         f"\n'unpacked_stem': 'python @local/strawberry.py @args',\n'dev_cmd': 'strawberry dev',"
+                         f"\n'unpacked_stem': 'python @local/blueberry.py @args',\n'dev_cmd': 'blueberry dev',"
                          f"\n'seed_cmd': 'cp -r * @dest',\n'advanced': {{\n'dev_branch':  '-dev'\n}}\n}}")
         config.close()
 
 
-# strawberry init
+# blueberry init
 # flags: --force: replaces any existing config with default; -p, --packed: generates the packed config
 def init(args):
     """

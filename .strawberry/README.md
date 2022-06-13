@@ -5,7 +5,6 @@
 
 ## Contents
 - [Requirements](#requirements)
-- [Terminology](#terminology)
 - [Installation](#install)
 - [Updating](#updating)
 - [How it works](#how-it-works)
@@ -17,12 +16,6 @@
 - pip
 - git (only for install.sh script)
 - bash
-
-#### [Back to contents](#contents)
-
-### Terminology
-
-- placeholder
 
 #### [Back to contents](#contents)
 
@@ -137,15 +130,6 @@ The packed flag generates a different skeleton to that of the unpacked or defaul
 ````
 > blueberry init --packed
 ````
-
-
-##### Help:
-The help command provides help for the commands, providing more detail about them.
-
-Ex.
-```
-> blueberry help dev
-```
 
 #### [Back to contents](#contents)
 

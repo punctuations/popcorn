@@ -8,7 +8,6 @@ PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
 
 
 # blueberry remove
-# flags: -d, --dev: remove development berries
 def remove(args):
     """
     Used to remove both production berries and development berries.

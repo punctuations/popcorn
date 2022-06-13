@@ -1,0 +1,2 @@
+#!/bin/bash
+python /Users/matt/git/blueberry/.blueberry/blueberry.py "$@"

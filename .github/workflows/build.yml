@@ -23,4 +23,4 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
       - name: Build with pyinstaller for ${{ matrix.config.os }}
-        run: pyinstaller strawberry.spec
+        run: pyinstaller blueberry.spec

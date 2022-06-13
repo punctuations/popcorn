@@ -1,8 +1,8 @@
 {
-    "berry_name": "strawberry",
+    "berry_name": "blueberry",
     "berry_type": "unpacked",
-    "unpacked_stem": "python @local/strawberry.py @args",
-    "dev_cmd": "strawberry dev",
+    "unpacked_stem": "python @local/blueberry.py @args",
+    "dev_cmd": "blueberry dev",
     "seed_cmd": "cp -r * @dest",
     "advanced": {
         "dev_branch":  "-dev"

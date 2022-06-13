@@ -16,6 +16,6 @@ if ! [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
 fi
 
 if [[ -d "$HOME/.local/bin/blueberry" ]]; then
-  echo "\u001b[38;5;48m 🫐 Blueberry successfully installed, please restart terminal for changes to apply. \u001b[0;0m"
+  echo "\u001b[38;5;48m 🍓 Blueberry successfully installed, please restart terminal for changes to apply. \u001b[0;0m"
 else
   echo "\u001b[38;5;1m error - \u001b[0;0m something went wrong while installing."

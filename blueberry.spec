@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['strawberry.py'],
+    ['blueberry.py'],
     pathex=[],
     binaries=[],
     datas=[('cmds', './cmds')],
@@ -28,7 +28,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='strawberry',
+    name='blueberry',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

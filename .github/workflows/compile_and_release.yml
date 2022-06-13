@@ -11,7 +11,7 @@ jobs:
       - name: Commits since last release
         id: commits
         run: |
-          git clone https://github.com/punctuations/strawberry ./tmp/ && cd tmp && echo "::set-output name=commits::$(git log $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)..HEAD --oneline)" && cd .. && rm -rf ./tmp
+          git clone https://github.com/punctuations/blueberry ./tmp/ && cd tmp && echo "::set-output name=commits::$(git log $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)..HEAD --oneline)" && cd .. && rm -rf ./tmp
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -54,7 +54,7 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
       - name: Build with pyinstaller for ${{ matrix.config.os }}
-        run: pyinstaller strawberry.spec
+        run: pyinstaller blueberry.spec
       - name: Upload Release Asset
         if: ${{ matrix.config.os != 'windows-latest' }}
         id: upload-release-asset 
@@ -63,8 +63,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./dist/strawberry
-          asset_name: strawberry-${{ matrix.config.os }}
+          asset_path: ./dist/blueberry
+          asset_name: blueberry-${{ matrix.config.os }}
           asset_content_type: application/x-executable
       - name: Upload Release Asset Windows
         if: ${{ matrix.config.os == 'windows-latest' }}
@@ -74,6 +74,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: .\dist\strawberry.exe
-          asset_name: strawberry-${{ matrix.config.os }}.exe
+          asset_path: .\dist\blueberry.exe
+          asset_name: blueberry-${{ matrix.config.os }}.exe
           asset_content_type: application/x-executable
