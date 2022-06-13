@@ -60,12 +60,13 @@ jobs:
         run: |
           cp README.md ./dist
           cp LICENSE ./dist
+          mv ./dist ./blueberry-${{ matrix.config.os }}
       - name: Archive Files
         if: ${{ matrix.config.os != 'windows-latest' }}
         uses: thedoctor0/zip-release@main
         with:
           type: 'tar'
-          path: './dist'
+          path: './blueberry-${{ matrix.config.os }}'
           filename: 'blueberry.tar.gz'
       - name: Upload Release Asset
         if: ${{ matrix.config.os != 'windows-latest' }}
