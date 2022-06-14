@@ -11,7 +11,7 @@ jobs:
       - name: Commits since last release
         id: commits
         run: |
-          git clone https://github.com/punctuations/blueberry ./tmp/ && cd tmp && echo "::set-output name=commits::$(git log $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)..HEAD --oneline)" && cd .. && rm -rf ./tmp
+          git clone https://github.com/punctuations/blueberry ./tmp/ && cd tmp && echo "::set-output name=commits::$(git log $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)..HEAD --oneline)" && echo "::set-output name=latest::git describe --tags" && cd .. && rm -rf ./tmp
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -29,6 +29,7 @@ jobs:
           prerelease: false
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      latest: ${{ steps.commits.outputs.latest }}
 
   compile_exec:
     needs: ['release']
@@ -90,3 +91,38 @@ jobs:
           asset_path: .\dist\blueberry.exe
           asset_name: blueberry-${{ matrix.config.os }}.exe
           asset_content_type: application/x-executable
+      - name: Generate SHA256 ubuntu
+        id: ubuntu-sha256
+        if: ${{ matrix.config.os == "ubuntu"}}
+        run: |
+          echo "::set-output name=sha::$(openssl sha256 < ./blueberry.tar.gz)
+      - name: Generate SHA256 macos
+        id: macos-sha256
+        if: ${{ matrix.config.os == "macos" }}
+        run: |
+          echo "::set-output name=sha::$(openssl sha256 < ./blueberry.tar.gz)
+    outputs:
+      ubuntu-256: ${{ steps.ubuntu-sha256.outputs.sha }}
+      macos-256: ${{ steps.macos-sha256.outputs.sha }}
+
+  update_homebrew:
+    needs: ["compile_exec"]
+    name: Update formulae
+    runs-on: ubuntu-latest
+    steps:
+      - name: clone repo
+        run: |
+          git clone https://github.com/punctuations/homebrew-tap
+      - name: modify file
+        run: |
+          echo '# typed: false\n# frozen_string_literal: true\n\nclass Blueberry < Formula\n  desc "🫐 A command-line tool for command-line tools."\n  homepage "https://github.com/punctuations/blueberry"\n  version "${{ needs.release.outputs.latest }}"\n\n  on_macos do\n    url "https://github.com/punctuations/blueberry/releases/download/${{ needs.release.outputs.latest }}/blueberry-macos-latest.tar.gz"\n    sha256 "${{ needs.compile_exec.outputs.macos-256 }}"\n\n    def install\n      bin.install "blueberry"\n    end\n  end\n\n  on_linux do\n    url "https://github.com/punctuations/blueberry/releases/download/${{ needs.release.outputs.latest }}/blueberry-ubuntu-latest.tar.gz\n    sha256 "${{ needs.compile_exec.outputs.ubuntu-256 }}"\n\n    def install\n      bin.install "blueberry"\n    end\n  end\nend' > homebrew-tap/blueberry.rb
+      - name: Update formulae
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source_file: './homebrew-tap/blueberry.rb'
+          destination_repo: 'punctuations/homebrew-tap'
+          user_email: 'matt@dont-ping.me'
+          user_name: 'punctuations'
+          commit_message: 'ci: bump blueberry to ${{ needs.release.outputs.latest }}\n\nAutomatic bump'
