@@ -11,7 +11,7 @@ jobs:
       - name: Commits since last release
         id: commits
         run: |
-          git clone https://github.com/punctuations/blueberry ./tmp/ && cd tmp && echo "::set-output name=commits::$(git log $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)..HEAD --oneline)" && echo "::set-output name=latest::git describe --tags" && cd .. && rm -rf ./tmp
+          git clone https://github.com/punctuations/blueberry ./tmp/ && cd tmp && echo "::set-output name=commits::$(git log $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)..HEAD --oneline)" && echo "::set-output name=latest::$(git describe --tags)" && cd .. && rm -rf ./tmp
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
