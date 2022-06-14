@@ -22,7 +22,7 @@
 
 ### Terminology
 
-- placeholder
+- `berry`: placeholder
 
 #### [Back to contents](#contents)
 
