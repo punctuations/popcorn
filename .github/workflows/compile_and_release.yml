@@ -95,18 +95,18 @@ jobs:
         id: ubuntu-sha256
         if: ${{ matrix.config.os == 'ubuntu-latest' }}
         run: |
-          echo "::set-output name=sha::$(openssl sha256 < ./blueberry.tar.gz)"
+          echo "::set-output name=sha::$(echo '$(openssl sha256 < ./blueberry.tar.gz)')"
       - name: Generate SHA256 macos
         id: macos-sha256
         if: ${{ matrix.config.os == 'macos-latest' }}
         run: |
-          echo "::set-output name=sha::$(openssl sha256 < ./blueberry.tar.gz)"
+          echo "::set-output name=sha::$(echo '$(openssl sha256 < ./blueberry.tar.gz)')"
     outputs:
       ubuntu-256: ${{ steps.ubuntu-sha256.outputs.sha }}
       macos-256: ${{ steps.macos-sha256.outputs.sha }}
 
   update_homebrew:
-    needs: ["compile_exec"]
+    needs: ['compile_exec', 'release']
     name: Update formulae
     runs-on: ubuntu-latest
     steps:
@@ -115,7 +115,7 @@ jobs:
           git clone https://github.com/punctuations/homebrew-tap
       - name: modify file
         run: |
-          echo '# typed: false\n# frozen_string_literal: true\n\nclass Blueberry < Formula\n  desc "🫐 A command-line tool for command-line tools."\n  homepage "https://github.com/punctuations/blueberry"\n  version "${{ needs.release.outputs.latest }}"\n\n  on_macos do\n    url "https://github.com/punctuations/blueberry/releases/download/${{ needs.release.outputs.latest }}/blueberry-macos-latest.tar.gz"\n    sha256 "${{ needs.compile_exec.outputs.macos-256 }}"\n\n    def install\n      bin.install "blueberry"\n    end\n  end\n\n  on_linux do\n    url "https://github.com/punctuations/blueberry/releases/download/${{ needs.release.outputs.latest }}/blueberry-ubuntu-latest.tar.gz\n    sha256 "${{ needs.compile_exec.outputs.ubuntu-256 }}"\n\n    def install\n      bin.install "blueberry"\n    end\n  end\nend' > homebrew-tap/blueberry.rb
+          echo -e '# typed: false\n# frozen_string_literal: true\n\nclass Blueberry < Formula\n  desc "🫐  A command-line tool for command-line tools."\n  homepage "https://github.com/punctuations/blueberry"\n  version "${{ needs.release.outputs.latest }}"\n\n  on_macos do\n    url "https://github.com/punctuations/blueberry/releases/download/${{ needs.release.outputs.latest }}/blueberry-macos-latest.tar.gz"\n    sha256 "${{ needs.compile_exec.outputs.macos-256 }}"\n\n    def install\n      bin.install "blueberry"\n    end\n  end\n\n  on_linux do\n    url "https://github.com/punctuations/blueberry/releases/download/${{ needs.release.outputs.latest }}/blueberry-ubuntu-latest.tar.gz\n    sha256 "${{ needs.compile_exec.outputs.ubuntu-256 }}"\n\n    def install\n      bin.install "blueberry"\n    end\n  end\nend' > homebrew-tap/blueberry.rb
       - name: Update formulae
         uses: dmnemec/copy_file_to_another_repo_action@main
         env:
@@ -125,4 +125,4 @@ jobs:
           destination_repo: 'punctuations/homebrew-tap'
           user_email: 'matt@dont-ping.me'
           user_name: 'punctuations'
-          commit_message: 'ci: bump blueberry to ${{ needs.release.outputs.latest }}\n\nAutomatic bump'
+          commit_message: 'ci: bump blueberry to ${{ needs.release.outputs.latest }}'
