@@ -7,6 +7,7 @@ from _utils import styled_print
 alias = ["-a", "--alias"]
 dev = ["-d", "--dev"]
 debug = ["--debug"]
+help_flag = ["--help", "-h"]
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -23,7 +24,6 @@ def resource_path(relative_path):
 
 
 def load_cmds():
-    print(os.listdir(ROOT_DIR))
     cmds = os.listdir(resource_path("cmds"))  # get all files in /cmds
     cmds = [s for s in cmds if s[0] not in "_."]  # remove hidden files
     cmds = [s[:-3] for s in cmds]  # remove '.py'
@@ -42,6 +42,8 @@ def blueberry(command):
     has_dev_flag = [element for element in dev if (element in command)]
     dev_index = command.index(has_dev_flag[0]) if len(has_dev_flag) >= 1 else 0
     has_debug_flag = [element for element in debug if (element in command)]
+    has_help_flag = [element for element in help_flag if (element in command)]
+    help_index = command.index(has_help_flag[0]) if len(has_help_flag) >= 1 else 0
     cmds = load_cmds()
 
     f = open("./.berryrc")
@@ -61,6 +63,9 @@ def blueberry(command):
             os.system(dev_command)
         except KeyError:
             run_dev(command[dev_index + 1:] if len(command) >= 2 else ["-l", "."])
+    elif has_help_flag:
+        run_help = getattr(cmds["help"], "help")
+        run_help(command[help_index + 1:])
     else:
         # if argument is passed in
         if len(command) >= 1:
