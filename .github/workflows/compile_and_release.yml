@@ -93,12 +93,12 @@ jobs:
           asset_content_type: application/x-executable
       - name: Generate SHA256 ubuntu
         id: ubuntu-sha256
-        if: ${{ matrix.config.os == "ubuntu"}}
+        if: ${{ matrix.config.os == 'ubuntu-latest' }}
         run: |
           echo "::set-output name=sha::$(openssl sha256 < ./blueberry.tar.gz)
       - name: Generate SHA256 macos
         id: macos-sha256
-        if: ${{ matrix.config.os == "macos" }}
+        if: ${{ matrix.config.os == 'macos-latest' }}
         run: |
           echo "::set-output name=sha::$(openssl sha256 < ./blueberry.tar.gz)
     outputs:
