@@ -12,6 +12,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0 # [!] we need to checkout with tags and commit history
+      - name: Output latest
+        run: |
+          echo "::set-output name=latest::$(git describe --tags)"
       - name: Get Commits since last Release
         id: changes
         uses: simbo/changes-since-last-release-action@v1
