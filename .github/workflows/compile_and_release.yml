@@ -13,6 +13,7 @@ jobs:
         with:
           fetch-depth: 0 # [!] we need to checkout with tags and commit history
       - name: Output latest
+        id: commits
         run: |
           echo "::set-output name=latest::$(git describe --tags)"
       - name: Get Commits since last Release
