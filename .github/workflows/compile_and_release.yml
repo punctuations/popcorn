@@ -8,13 +8,13 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Commits since last release
-        id: commits
-        run: |
-          git clone https://github.com/punctuations/blueberry ./tmp/ && cd tmp && echo "$(git log $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)..HEAD --oneline)" >> tmp.txt && echo "::set-output name=commits::$(<tmp.txt)" && echo "::set-output name=latest::$(git describe --tags)" && cd .. && rm -rf ./tmp
-      - name: debug
-        run: |
-          echo ${{ steps.commits.outputs.commits }}
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # [!] we need to checkout with tags and commit history
+      - name: Get Commits since last Release
+        id: changes
+        uses: simbo/changes-since-last-release-action@v1
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -25,7 +25,9 @@ jobs:
           release_name: ${{ github.ref }}
           body: |
             ## 📋 Changelog:
-            ${{ steps.commits.outputs.commits }}
+            
+            Commits since ${{ steps.changes.outputs.last-tag }}:
+            ${{ steps.changes.outputs.log }}
             
             <sub>This release is automatically generated.</sub>
           draft: false
