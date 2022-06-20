@@ -111,7 +111,6 @@ jobs:
       macos-256: ${{ steps.macos-sha256.outputs.sha }}
 
   update_homebrew:
-    if: ${{ 'true' == 'false' }}
     needs: ['compile_exec', 'release']
     name: Update formulae
     runs-on: ubuntu-latest
