@@ -7,13 +7,19 @@ from _utils import styled_print
 DEV_DIR = f"{os.path.realpath(os.getcwd())}{os.sep}.blueberry"
 PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
 
-try:
-    f = open("./.berryrc")
-    config = json.load(f)
-    f.close()
-except FileNotFoundError:
-    styled_print.error("Please create a .berryrc file.")
-    sys.exit(0)
+config = {}
+
+
+def initialize_globals():
+    global config
+
+    try:
+        f = open("./.berryrc")
+        config = json.load(f)
+        f.close()
+    except FileNotFoundError:
+        styled_print.error("Please create a .berryrc file.")
+        sys.exit(0)
 
 
 # blueberry install
@@ -24,6 +30,8 @@ def install(args):
 
     :param args: arguments passed to command.
     """
+    initialize_globals()
+
     dev = ["-d", "--dev"]
     has_dev_flag = [element for element in dev if (element in args)]
 

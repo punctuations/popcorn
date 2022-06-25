@@ -21,16 +21,27 @@ DEV_DIR = f"{os.path.realpath(os.getcwd())}{os.sep}.blueberry"
 last_event = {"message": False}
 event_delta = timedelta(seconds=int(2))
 
-try:
-    f = open("./.berryrc")
-    config = json.load(f)
-    f.close()
-except FileNotFoundError:
-    styled_print.error("Please create a .berryrc file.")
-    sys.exit(0)
+config = {}
+berry_name = ""
+berry_type = ""
 
-berry_name = config["berry_name"]
-berry_type = config["berry_type"]
+
+def initialize_globals():
+    global config
+    global berry_name
+    global berry_type
+
+    try:
+        f = open("./.berryrc")
+        config = json.load(f)
+        f.close()
+    except FileNotFoundError:
+        styled_print.error("Please create a .berryrc file.")
+        sys.exit(0)
+
+    berry_name = config["berry_name"]
+    berry_type = config["berry_type"]
+
 
 rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
 profile = f"{os.environ['HOME']}{os.sep}.profile"
@@ -135,6 +146,8 @@ def dev(args):
 
     :param args: arguments passed to command
     """
+    initialize_globals()
+
     has_listen_flag = [element for element in listen if (element in args)]
     listen_index = args.index(has_listen_flag[0]) if len(has_listen_flag) >= 1 else 0
 

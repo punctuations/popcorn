@@ -8,17 +8,28 @@ import threading
 
 from _utils import styled_print
 
-try:
-    f = open("./.berryrc")
-    config = json.load(f)
-    f.close()
-except FileNotFoundError:
-    styled_print.error("Please create a .berryrc file.")
-    sys.exit(0)
+
+config = {}
+berry_name = ""
+berry_type = ""
+
+
+def initialize_globals():
+    global berry_name
+    global berry_type
+    global config
+    try:
+        f = open("./.berryrc")
+        config = json.load(f)
+        f.close()
+    except FileNotFoundError:
+        styled_print.error("Please create a .berryrc file.")
+        sys.exit(0)
+
+    berry_name = config["berry_name"]
+    berry_type = config["berry_type"]
 
 PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
-berry_name = config["berry_name"]
-berry_type = config["berry_type"]
 
 rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
 dotprofile = f"{os.environ['HOME']}{os.sep}.profile"
@@ -148,6 +159,8 @@ def build(args):
 
     :param args: arguments passed to command
     """
+    initialize_globals()
+
     output = ["-o", "--output"]
     # when file is placed here make sure to set path variable to file containing accessible target
     # ex. (unpacked) export PATH = $PATH:$HOME/.local/bin/blueberry
