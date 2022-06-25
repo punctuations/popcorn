@@ -23,8 +23,6 @@
 ### Terminology
 
 - `berry`: placeholder
-- pg_dump --clean --if-exists --quote-all-identifiers -h https://opbznnexdyyojmksfwbh.supabase.co -U postgres > dump.sql
-- 
 
 #### [Back to contents](#contents)
 
