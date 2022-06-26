@@ -17,6 +17,7 @@ from _utils import styled_print
 listen = ["-l", "--listen"]
 
 DEV_DIR = f"{os.path.realpath(os.getcwd())}{os.sep}.blueberry"
+PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
 
 last_event = {"message": False}
 event_delta = timedelta(seconds=int(2))
@@ -147,6 +148,10 @@ def dev(args):
     :param args: arguments passed to command
     """
     initialize_globals()
+
+    if f"export PATH=$PATH{os.pathsep}{DEV_DIR}\n" not in os.environ["PATH"]:
+        styled_print.error("Development berry not installed.\n\t\tplease try: blueberry install --dev")
+        sys.exit(0)
 
     has_listen_flag = [element for element in listen if (element in args)]
     listen_index = args.index(has_listen_flag[0]) if len(has_listen_flag) >= 1 else 0

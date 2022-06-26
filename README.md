@@ -22,7 +22,13 @@
 
 ### Terminology
 
-- `berry`: placeholder
+- `berry`: A filesystem that gets compiled by blueberry.
+- Types:
+  - `packed`: Refers to the type of output as a single binary from the filesystem.
+  - `unpacked`: Refers to the type of output as a multi-file structure from the filesystem.
+- `unpacked_stem`: The command to enter the main file in an unpacked berry. (See example [config](https://github.com/punctuations/blueberry/blob/main/.berryrc))
+- `seed_cmd`: The command to compile the berry.
+- `dev_branch`: The naming scheme given to a development berry.
 
 #### [Back to contents](#contents)
 

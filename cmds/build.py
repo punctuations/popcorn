@@ -8,7 +8,6 @@ import threading
 
 from _utils import styled_print
 
-
 config = {}
 berry_name = ""
 berry_type = ""
@@ -37,6 +36,8 @@ dotprofile = f"{os.environ['HOME']}{os.sep}.profile"
 
 
 def build_thread(output):
+    path_init = False
+
     try:
         shutil.rmtree(f"{PROD_DIR}{os.sep}{output}")
         os.mkdir(PROD_DIR)
@@ -56,7 +57,7 @@ def build_thread(output):
                 os.mkdir(f"{PROD_DIR}{os.sep}{output}")
             except FileExistsError:
                 pass
-            seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE)\
+            seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE) \
                 .sub(f"{PROD_DIR}{os.sep}{output}", config["seed_cmd"])
         else:
             seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(f"{PROD_DIR}", config["seed_cmd"])
@@ -66,7 +67,7 @@ def build_thread(output):
         if berry_type.lower() == "unpacked":
             try:
                 arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_stem"])
-                unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE)\
+                unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE) \
                     .sub(f"{PROD_DIR}{os.sep}{output[:-1] if output.endswith('/') else output}", arg_stem)
                 with open(f"{PROD_DIR}{os.sep}{output}{berry_name}", "w") as berry:
                     berry.write(f"#!/bin/bash\n{unpacked_stem}")
@@ -115,12 +116,14 @@ def build_thread(output):
                 pit.close()
     else:
         if PROD_DIR not in os.environ["PATH"] and berry_type.lower() == "packed":
+            path_init = True
             os.system(f"setx PATH '%PATH%{os.pathsep}{PROD_DIR}'")
+            styled_print.success("Added to path")
 
         if f"{PROD_DIR}{os.sep}{output}" not in os.environ["PATH"] and berry_type.lower() == "unpacked":
+            path_init = True
             os.system(f"setx PATH '%PATH%{os.pathsep}{PROD_DIR}{output}'")
-
-    styled_print.success("Added to path")
+            styled_print.success("Added to path")
 
     if os.name != "nt":
         if os.path.exists(rcfile):
@@ -141,15 +144,16 @@ def build_thread(output):
                     init.write(f". \"$HOME{os.sep}.berries{os.sep}pits.sh\"\n")
                     init.write(proflines)
                     init.close()
-        if os.name == 'nt':
-            os.system(". $profile")
-        else:
-            if os.path.exists(rcfile):
-                os.system(f"source {rcfile}")
+        if path_init:
+            if os.name == 'nt':
+                os.system(". $profile")
             else:
-                os.system(f"source {dotprofile}")
+                if os.path.exists(rcfile):
+                    os.system(f"source {rcfile}")
+                else:
+                    os.system(f"source {dotprofile}")
 
-    styled_print.success("Please restart the terminal session to apply changes.")
+    styled_print.success(f"Successfully built {berry_name}.")
 
 
 # blueberry build
