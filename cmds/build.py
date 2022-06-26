@@ -29,6 +29,7 @@ def initialize_globals():
     berry_name = config["berry_name"]
     berry_type = config["berry_type"]
 
+
 PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
 
 rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"

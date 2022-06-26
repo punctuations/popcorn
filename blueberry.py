@@ -54,7 +54,7 @@ def blueberry(command):
     cmds = load_cmds(has_debug_flag)
     styled_print.info("after load") if has_debug_flag else None
 
-    command_with_debug_flag = 0 if not has_debug_flag or debug_index != 0 else debug_index + 1
+    cmd_with_debug = 0 if not has_debug_flag or debug_index != 0 else debug_index + 1
 
     if has_debug_flag:
         styled_print.info(f"ran with args {command}: {len(command)}")
@@ -91,10 +91,10 @@ def blueberry(command):
         if len(command) >= 1:
             # if command does not exist go to build command.
             try:
-                run_command = getattr(cmds[command[command_with_debug_flag]], command[command_with_debug_flag])
+                run_command = getattr(cmds[command[cmd_with_debug]], command[cmd_with_debug])
 
-                styled_print.info(f"running {command[command_with_debug_flag]} command") if has_debug_flag else None
-                run_command(command[command_with_debug_flag + 1:] if command[command_with_debug_flag + 1:] != ['--debug'] else [])
+                styled_print.info(f"running {command[cmd_with_debug]} command") if has_debug_flag else None
+                run_command(command[cmd_with_debug + 1:] if command[cmd_with_debug + 1:] != ['--debug'] else [])
             except KeyError:
                 styled_print.info("running build command as fallback") if has_debug_flag else None
 
