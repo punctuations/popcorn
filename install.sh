@@ -26,7 +26,7 @@ curl --silent $URL -L --output /tmp/blueberry-download/blueberry.tar.gz # Downlo
 tar -zxf /tmp/blueberry-download/blueberry.tar.gz -C /tmp/blueberry-download # Extract blueberry archive
 
 # move blueberry to .local/bin
-cd /tmp/blueberry-download && mv blueberry ~/local/.bin/
+cd /tmp/blueberry-download && mv blueberry ~/.local/bin/
 
 if ! [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
   IFS="/" read -ra RC <<<"$SHELL"
