@@ -4,7 +4,7 @@
 # Blueberry command-line installation #
 ########################################
 
-echo -e "\u001b[38;5;13m event - \033[0;0m Collecting data..."
+echo -e "\033[38;5;13m event - \033[0;0m Collecting data..."
 
 # Get latest version of blueberry
 RELEASE=$(curl --silent "https://api.github.com/repos/punctuations/blueberry/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
