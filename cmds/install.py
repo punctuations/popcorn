@@ -76,8 +76,10 @@ def install(args):
 
                 if os.path.exists(rcfile):
                     os.system(f"source {rcfile}")
+                    styled_print.success("Please restart the terminal to apply changes.")
                 else:
                     os.system(f"source {dotprofile}")
+                    styled_print.success("Please restart the terminal to apply changes.")
         else:
             styled_print.info("Berry already installed.")
     else:

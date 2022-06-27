@@ -19,7 +19,7 @@ fi
 # Get URL to latest release of blueberry
 URL="https://github.com/punctuations/blueberry/releases/download/$RELEASE/blueberry-$OSFILE-latest.tar.gz"
 
-echo -e "\u001b[38;5;13m event - \033[0;0m Data collected, asserting..."
+echo -e "\033[38;5;13m event - \033[0;0m Data collected, asserting..."
 
 # Setup tmp download
 rm -Rf /tmp/blueberry-download
@@ -32,7 +32,7 @@ tar -zxf /tmp/blueberry-download/blueberry.tar.gz -C /tmp/blueberry-download # E
 # move blueberry to .local/bin
 cd /tmp/blueberry-download/blueberry-$OSFILE-latest && mv blueberry ~/.local/bin/
 
-echo -e "\u001b[38;5;13m event - \033[0;0m assertion completed."
+echo -e "\033[38;5;13m event - \033[0;0m assertion completed."
 
 if ! [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
   IFS="/" read -ra RC <<<"$SHELL"
@@ -44,7 +44,7 @@ if ! [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
 fi
 
 if [[ -f "$HOME/.local/bin/blueberry" ]]; then
-  echo -e  "\u001b[38;5;48m 🫐 Blueberry successfully installed, please restart terminal for changes to apply. \u001b[0;0m"
+  echo -e  "\033[38;5;48m 🫐 Blueberry successfully installed, please restart terminal for changes to apply. \033[0;0m"
 else
-  echo -e "\u001b[38;5;1m error - \u001b[0;0m something went wrong while installing."
+  echo -e "\033[38;5;1m error - \033[0;0m something went wrong while installing."
 fi

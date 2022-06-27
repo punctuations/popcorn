@@ -149,7 +149,7 @@ def dev(args):
     """
     initialize_globals()
 
-    if f"export PATH=$PATH{os.pathsep}{DEV_DIR}\n" not in os.environ["PATH"]:
+    if DEV_DIR not in os.environ["PATH"]:
         styled_print.error("Development berry not installed.\n\t\tplease try: blueberry install --dev")
         sys.exit(0)
 
