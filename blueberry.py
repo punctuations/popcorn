@@ -8,6 +8,7 @@ alias = ["-a", "--alias"]
 dev = ["-d", "--dev"]
 debug = ["--debug"]
 help_flag = ["--help", "-h"]
+version_flag = ["--version", "-v"]
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -49,6 +50,7 @@ def blueberry(command):
     debug_index = command.index(has_debug_flag[0]) if len(has_debug_flag) >= 1 else 0
     has_help_flag = [element for element in help_flag if (element in command)]
     help_index = command.index(has_help_flag[0]) if len(has_help_flag) >= 1 else 0
+    has_version_flag = [element for element in version_flag if (element in command)]
 
     styled_print.info("before load") if has_debug_flag else None
     cmds = load_cmds(has_debug_flag)
@@ -63,6 +65,11 @@ def blueberry(command):
         styled_print.info("running alias command") if has_debug_flag else None
 
         print("function berry () { eval $(blueberry $@); }")
+    elif has_version_flag:
+        f = open(resource_path("blame.json"))
+        blame = json.load(f)
+        f.close()
+        styled_print.info(blame["version"])
     elif has_dev_flag and len(command) == 1:
         styled_print.info("running dev command from flag") if has_debug_flag else None
         # * Run blueberry command based on .berryrc options and pass in the path

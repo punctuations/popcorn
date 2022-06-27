@@ -150,7 +150,7 @@ def dev(args):
     initialize_globals()
 
     if DEV_DIR not in os.environ["PATH"]:
-        styled_print.error("Development berry not installed.\n\t\tplease try: blueberry install --dev")
+        styled_print.warning("Development berry not installed.\n\t\tplease try: blueberry install --dev")
         sys.exit(0)
 
     has_listen_flag = [element for element in listen if (element in args)]
