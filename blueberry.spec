@@ -8,7 +8,7 @@ a = Analysis(
     ['blueberry.py'],
     pathex=[],
     binaries=[],
-    datas=[('cmds', './cmds', 'blame.json')],
+    datas=[('cmds', './cmds'), ('blame.json', './blame.json')],
     hiddenimports=['watchdog.events', 'watchdog.observers'],
     hookspath=[],
     hooksconfig={},
