@@ -15,7 +15,6 @@
 ### Requirements
 - python 3.7+
 - pip
-- git (only for install.sh script)
 - bash
 
 #### [Back to contents](#contents)
