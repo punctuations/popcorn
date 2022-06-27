@@ -58,11 +58,10 @@ def blueberry(command):
 
     cmd_with_debug = 0 if not has_debug_flag or debug_index != 0 else debug_index + 1
 
-    if has_debug_flag:
-        styled_print.info(f"ran with args {command}: {len(command)}")
+    styled_print.debug(f"ran with args {command}: {len(command)}") if has_debug_flag else None
 
     if has_alias_flag:
-        styled_print.info("running alias command") if has_debug_flag else None
+        styled_print.debug("running alias command") if has_debug_flag else None
 
         print("function berry () { eval $(blueberry $@); }")
     elif has_version_flag:
@@ -71,7 +70,7 @@ def blueberry(command):
         f.close()
         styled_print.info(blame["version"])
     elif has_dev_flag and len(command) == 1:
-        styled_print.info("running dev command from flag") if has_debug_flag else None
+        styled_print.debug("running dev command from flag") if has_debug_flag else None
         # * Run blueberry command based on .berryrc options and pass in the path
 
         try:
@@ -89,7 +88,7 @@ def blueberry(command):
         except KeyError:
             run_dev(command[dev_index + 1:] if len(command) >= 2 else ["-l", "."])
     elif has_help_flag:
-        styled_print.info("running help command from flag") if has_debug_flag else None
+        styled_print.debug("running help command from flag") if has_debug_flag else None
 
         run_help = getattr(cmds["help"], "help")
         run_help(command[help_index + 1:])
@@ -100,16 +99,16 @@ def blueberry(command):
             try:
                 run_command = getattr(cmds[command[cmd_with_debug]], command[cmd_with_debug])
 
-                styled_print.info(f"running {command[cmd_with_debug]} command") if has_debug_flag else None
+                styled_print.debug(f"running {command[cmd_with_debug]} command") if has_debug_flag else None
                 run_command(command[cmd_with_debug + 1:] if command[cmd_with_debug + 1:] != ['--debug'] else [])
             except KeyError:
-                styled_print.info("running build command as fallback") if has_debug_flag else None
+                styled_print.debug("running build command as fallback") if has_debug_flag else None
 
                 # command is: blueberry /path/to/files
                 run_build = getattr(cmds["build"], "build")
                 run_build(command)
         else:
-            styled_print.info("running install command from no args") if has_debug_flag else None
+            styled_print.debug("running install command from no args") if has_debug_flag else None
 
             # command is: blueberry
             # * Run install command
