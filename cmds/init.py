@@ -10,9 +10,9 @@ def create_config(has_packed):
                          f'\n"dev_cmd": "blueberry dev",\n"seed_cmd": "go build -o @dest",\n"advanced": {{'
                          f'\n"dev_branch":  "-dev"\n}}\n}}')
         else:
-            config.write(f'{{\n"berry_name": "{os.getcwd().split(os.sep)[-1]}",\n"berry_type": "unpacked",'
-                         f'\n"unpacked_stem": "python @local/blueberry.py @args",\n"dev_cmd": "blueberry dev",'
-                         f'\n"seed_cmd": "cp -r * @dest",\n"advanced": {{\n"dev_branch":  "-dev"\n}}\n}}')
+            config.write(f'{{\n\t"berry_name": "{os.getcwd().split(os.sep)[-1]}",\n\t"berry_type": "unpacked",'
+                         f'\n\t"unpacked_stem": "python @local/blueberry.py @args",\n\t"dev_cmd": "blueberry dev",'
+                         f'\n\t"seed_cmd": "cp -r * @dest",\n\t"advanced": {{\n\t\t"dev_branch":  "-dev"\n\t}}\n}}')
         config.close()
 
 
