@@ -42,6 +42,9 @@ def install(args):
         sys.exit(0)
 
     if not os.path.exists(f'{PROD_DIR}{os.sep}pits.sh'):
+        if not os.path.exists(PROD_DIR):
+            os.mkdir(PROD_DIR)
+
         with open(f'{PROD_DIR}{os.sep}pits.sh', "w") as pit:
             pit.write("#!/bin/bash\n")
             pit.close()

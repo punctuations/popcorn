@@ -63,7 +63,7 @@ def blueberry(command):
         styled_print.info("running alias command") if has_debug_flag else None
 
         print("function berry () { eval $(blueberry $@); }")
-    elif has_dev_flag:
+    elif has_dev_flag and command[dev_index-1] != "install":
         styled_print.info("running dev command from flag") if has_debug_flag else None
         # * Run blueberry command based on .berryrc options and pass in the path
 
