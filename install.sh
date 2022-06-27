@@ -4,7 +4,7 @@
 # Blueberry command-line installation #
 ########################################
 
-echo -e "\033[38;5;13m event - \033[0;0m Collecting data..."
+echo -e "\033[38;5;13m event - \033[0;0m 1/3 Data collection."
 
 # Get latest version of blueberry
 RELEASE=$(curl --silent "https://api.github.com/repos/punctuations/blueberry/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
@@ -19,7 +19,7 @@ fi
 # Get URL to latest release of blueberry
 URL="https://github.com/punctuations/blueberry/releases/download/$RELEASE/blueberry-$OSFILE-latest.tar.gz"
 
-echo -e "\033[38;5;13m event - \033[0;0m Data collected, asserting..."
+echo -e "\033[38;5;13m event - \033[0;0m 2/3 Assertion."
 
 # Setup tmp download
 rm -Rf /tmp/blueberry-download
@@ -32,7 +32,7 @@ tar -zxf /tmp/blueberry-download/blueberry.tar.gz -C /tmp/blueberry-download # E
 # move blueberry to .local/bin
 cd /tmp/blueberry-download/blueberry-$OSFILE-latest && mv blueberry ~/.local/bin/
 
-echo -e "\033[38;5;13m event - \033[0;0m assertion completed."
+echo -e "\033[38;5;13m event - \033[0;0m 3/3 Cleanup."
 
 if ! [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
   IFS="/" read -ra RC <<<"$SHELL"
