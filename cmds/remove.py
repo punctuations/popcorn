@@ -22,14 +22,14 @@ def remove(args):
         path = os.environ["PATH"]
 
         styled_print.info(f"Removing {args[0]}...")
-        if f"{args[0]}{os.sep}.blueberry" in path:
-            if os.name == 'nt':
-                split_paths = path.split(os.pathsep)
-                removed_berry = f'{args[0]}{os.sep}.blueberry'
-                os.system(
-                    f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_berry not in i])}'")
-            else:
-                if has_dev_flag:
+        if has_dev_flag:
+            if f"{args[0]}{os.sep}.blueberry" in path:
+                if os.name == 'nt':
+                    split_paths = path.split(os.pathsep)
+                    removed_berry = f'{args[0]}{os.sep}.blueberry'
+                    os.system(
+                        f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_berry not in i])}'")
+                else:
                     rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
                     profile = f"{os.environ['HOME']}{os.sep}.profile"
 
@@ -49,6 +49,23 @@ def remove(args):
                             f.write(data)
                             f.truncate()
                             f.close()
+                styled_print.success(f"Removed {args[0]}")
+                styled_print.info("Please restart the terminal to apply changes.")
+            else:
+                styled_print.error("Berry not installed.")
+        else:
+            if f"{PROD_DIR}{os.sep}{args[0]}" in path:
+                if os.name == 'nt':
+                    split_paths = path.split(os.pathsep)
+                    removed_berry = f'{PROD_DIR}{os.sep}{args[0]}'
+                    os.system(
+                        f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_berry not in i])}'")
+
+                    try:
+                        shutil.rmtree(f"{PROD_DIR}{os.sep}{args[0]}")
+                    except FileNotFoundError:
+                        styled_print.error("Berry not found.")
+                        sys.exit(0)
                 else:
                     if args[0] == "pits.sh":
                         styled_print.error("Not a berry.")
@@ -67,9 +84,10 @@ def remove(args):
                     except FileNotFoundError:
                         styled_print.error("Berry not found.")
                         sys.exit(0)
-            styled_print.success(f"Removed {args[0]}")
-            styled_print.info("Please restart the terminal to apply changes.")
-        else:
-            styled_print.error("Berry not installed.")
+
+                styled_print.success(f"Removed {args[0]}")
+                styled_print.info("Please restart the terminal to apply changes.")
+            else:
+                styled_print.error("Berry not installed.")
     else:
         styled_print.error("Please specify a berry to remove.")
