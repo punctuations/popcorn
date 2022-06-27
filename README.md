@@ -33,12 +33,17 @@
 
 ### Install
 
-Linux/Mac:
+**Linux/Mac:**
 ```bash
 curl -sSL https://cmdf.at/blueberry | bash
 ```
+or with homebrew
+```bash
+brew tap punctuations/tap
+brew install punctuations/tap/blueberry
+```
 
-Windows:
+**Windows:**
 ```powershell
 coming soon..
 ```
@@ -46,7 +51,7 @@ coming soon..
 #### [Back to contents](#contents)
 
 ### Updating
-Not yet implemented
+If installed with the installation script just re-run the script, and it will update the program.
 
 #### [Back to contents](#contents)
 
