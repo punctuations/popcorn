@@ -72,7 +72,7 @@ def remove(args):
                         sys.exit(0)
 
                     pits = f'{PROD_DIR}{os.sep}pits.sh'
-                    with open(pits) as pit:
+                    with open(pits, 'r+') as pit:
                         data = ''.join([i for i in pit if args[0] not in i])
                         pit.seek(0)
                         pit.write(data)
