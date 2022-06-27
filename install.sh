@@ -8,7 +8,7 @@
 RELEASE=$(curl --silent "https://api.github.com/repos/punctuations/blueberry/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
 # Get OS
-if [[ "$OSTYPE" == "darwin*" ]]; then
+if [[ "$OSTYPE" == "darwin"* ]]; then
   OSFILE="macos"
 else
   OSFILE="ubuntu"
