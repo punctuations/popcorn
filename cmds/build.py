@@ -52,6 +52,7 @@ def build_thread(output):
         sys.exit(0)
 
     try:
+        # run seed_cmd
         if berry_type.lower() == "unpacked":
             try:
                 os.mkdir(f"{PROD_DIR}{os.sep}{output}")
@@ -63,7 +64,7 @@ def build_thread(output):
             seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(f"{PROD_DIR}", config["seed_cmd"])
         exit_status = os.WEXITSTATUS(os.system(seed_cmd))
 
-        # create unpacked berry.
+        # create unpacked berry with unpacked stem.
         if berry_type.lower() == "unpacked":
             try:
                 arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_stem"])
@@ -77,6 +78,7 @@ def build_thread(output):
                 berry.close()
                 sys.exit(0)
 
+        # change permissions
         try:
             os.chmod(os.path.join(PROD_DIR, output if berry_type.lower() == "packed" else f"{output}{berry_name}"),
                      stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
