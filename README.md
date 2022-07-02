@@ -35,7 +35,7 @@
 
 **Linux/Mac:**
 ```bash
-curl -sSL https://cmdf.at/blueberry | bash
+curl -sSL cmdf.at/blueberry | bash
 ```
 or with homebrew
 ```bash
@@ -45,7 +45,11 @@ brew install punctuations/tap/blueberry
 
 **Windows:**
 ```powershell
-coming soon..
+iwr -useb cmdf.at/blueberry/windows | iex
+```
+or with Chocolately
+```powershell
+coming soon...
 ```
 
 #### [Back to contents](#contents)
