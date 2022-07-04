@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['blueberry.py'],
+    ['popcorn.py'],
     pathex=[],
     binaries=[],
     datas=[('cmds', './cmds'), ('blame.json', '.')],
@@ -28,7 +28,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='blueberry',
+    name='popcorn',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

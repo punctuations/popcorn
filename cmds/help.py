@@ -5,7 +5,7 @@ import sys
 from _utils import styled_print
 
 
-# blueberry help
+# popcorn help
 def help(args):
     """
     Used to get more information about commands.
@@ -45,13 +45,13 @@ def help(args):
                 definitions.append(contents.split("\"\"\"")[1].split(":")[0])
                 f.close()
 
-        print(f"\n \u001b[40;1;1m {blame['name']} \u001b[0;0m v\u001b[38;5;48m{blame['version']}\u001b[0;0m")
-        print(f"\n\u001b[38;5;8m  💻 {blame['source']}\u001b[0;0m")
-        print("\n\u001b[38;5;13m ### Description \033[0;0m\n")
+        print(f"\n [40;1;1m {blame['name']} [0;0m v[38;5;48m{blame['version']}[0;0m")
+        print(f"\n[38;5;8m  💻 {blame['source']}[0;0m")
+        print("\n[38;5;13m ### Description [0;0m\n")
         print(f"  {blame['description']}")
-        print("\n\u001b[38;5;13m ### Commands \033[0;0m\n")
+        print("\n[38;5;13m ### Commands [0;0m\n")
         for i, command in enumerate(commands):
-            print(f"  • \u001b[38;5;4m {command} \u001b[0;0m> {' '.join(definitions[i].split())}")
+            print(f"  • [38;5;4m {command} [0;0m> {' '.join(definitions[i].split())}")
     else:
         command_file = f"{os.path.dirname(os.path.realpath(__file__))}{os.sep}{args[0]}.py"
         if os.path.exists(command_file):
@@ -60,14 +60,14 @@ def help(args):
             command.close()
             command_desc = contents.split('\"\"\"\n')[1].split("\n")[0]
 
-            print(f"\n \u001b[40;5;1m {blame['name']} \u001b[0;0m v\u001b[38;5;48m{blame['version']}\u001b[0;0m")
-            print(f"\n\u001b[38;5;8m  💻 {blame['source']}\u001b[0;0m")
-            print("\n\u001b[38;5;13m ### Usage \033[0;0m\n")
+            print(f"\n [40;5;1m {blame['name']} [0;0m v[38;5;48m{blame['version']}[0;0m")
+            print(f"\n[38;5;8m  💻 {blame['source']}[0;0m")
+            print("\n[38;5;13m ### Usage [0;0m\n")
             print(f"  {command_desc}")
-            print("\n\u001b[38;5;13m ### Flags \033[0;0m\n")
+            print("\n[38;5;13m ### Flags [0;0m\n")
             for flags in contents.split("# flags: ")[1].split("\n")[0].split(";"):
                 flag = flags.split(":")[0]
                 flag_desc = flags.split(":")[1].split("\n")[0]
-                print(f"  • \u001b[38;5;4m {flag} \u001b[0;0m> {flag_desc}")
+                print(f"  • [38;5;4m {flag} [0;0m> {flag_desc}")
         else:
             styled_print.error("Command not found")

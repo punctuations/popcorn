@@ -4,23 +4,23 @@ from _utils import styled_print
 
 
 def create_config(has_packed):
-    with open('.berryrc', "w") as config:
+    with open('.kernelrc', "w") as config:
         if has_packed:
-            config.write(f'{{\n"berry_name": "{os.getcwd().split(os.sep)[-1]}",\n"berry_type": "packed",'
-                         f'\n"dev_cmd": "blueberry dev",\n"seed_cmd": "go build -o @dest",\n"advanced": {{'
-                         f'\n"dev_branch":  "-dev"\n}}\n}}')
+            config.write(f'{{\n"kernel_name": "{os.getcwd().split(os.sep)[-1]}",\n"kernel_type": "packed",'
+                         f'\n"dev_cmd": "popcorn dev",\n"seed_cmd": "go build -o @dest",\n"advanced": {{'
+                         f'\n"dev_stalk":  "-dev"\n}}\n}}')
         else:
-            config.write(f'{{\n\t"berry_name": "{os.getcwd().split(os.sep)[-1]}",\n\t"berry_type": "unpacked",'
-                         f'\n\t"unpacked_stem": "python @local/blueberry.py @args",\n\t"dev_cmd": "blueberry dev",'
-                         f'\n\t"seed_cmd": "cp -r * @dest",\n\t"advanced": {{\n\t\t"dev_branch":  "-dev"\n\t}}\n}}')
+            config.write(f'{{\n\t"kernel_name": "{os.getcwd().split(os.sep)[-1]}",\n\t"kernel_type": "unpacked",'
+                         f'\n\t"unpacked_husk": "python @local/popcorn.py @args",\n\t"dev_cmd": "popcorn dev",'
+                         f'\n\t"seed_cmd": "cp -r * @dest",\n\t"advanced": {{\n\t\t"dev_stalk":  "-dev"\n\t}}\n}}')
         config.close()
 
 
-# blueberry init
+# popcorn init
 # flags: --force: replaces any existing config with default; -p, --packed: generates the packed config
 def init(args):
     """
-    Used to initialize a .berryrc configuration file.
+    Used to initialize a .kernelrc configuration file.
 
     :param args: arguments passed to command
     """
@@ -30,9 +30,9 @@ def init(args):
     has_force_flag = [element for element in force if (element in args)]
     has_packed_flag = [element for element in packed if (element in args)]
 
-    if not os.path.exists('.berryrc'):
+    if not os.path.exists('.kernelrc'):
         create_config(has_packed_flag)
     elif has_force_flag:
         create_config(has_packed_flag)
     else:
-        styled_print.info(".berryrc already exists -- No changes made.")
+        styled_print.info(".kernelrc already exists -- No changes made.")

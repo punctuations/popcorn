@@ -1,0 +1,11 @@
+{
+    "kernel_name": "popcorn",
+    "kernel_type": "unpacked",
+    "unpacked_husk": "python @local/popcorn.py @args",
+    "dev_cmd": "popcorn dev",
+    "seed_cmd": "cp -r * @dest",
+    "advanced": {
+        "os": ["mac", "windows", "linux"],
+        "dev_stalk":  "-dev"
+    }
+}

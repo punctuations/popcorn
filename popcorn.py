@@ -41,7 +41,7 @@ def load_cmds(has_debug_flag: list[str]):
     return cmds_dict
 
 
-def blueberry(command):
+def popcorn(command):
     has_alias_flag = [element for element in alias if (element in command)]
     # get positional index where it is in list
     has_dev_flag = [element for element in dev if (element in command)]
@@ -63,7 +63,7 @@ def blueberry(command):
     if has_alias_flag:
         styled_print.debug("running alias command") if has_debug_flag else None
 
-        print("function berry () { eval $(blueberry $@); }")
+        print("function kernel () { eval $(popcorn $@); }")
     elif has_version_flag:
         f = open(resource_path("blame.json"))
         blame = json.load(f)
@@ -71,14 +71,14 @@ def blueberry(command):
         styled_print.info(blame["version"])
     elif has_dev_flag and len(command) == 1:
         styled_print.debug("running dev command from flag") if has_debug_flag else None
-        # * Run blueberry command based on .berryrc options and pass in the path
+        # * Run popcorn command based on .kernelrc options and pass in the path
 
         try:
-            f = open("./.berryrc")
+            f = open("./.kernelrc")
             config = json.load(f)
             f.close()
         except FileNotFoundError:
-            styled_print.error("Please create a .berryrc file.")
+            styled_print.error("Please create a .kernelrc file.")
             sys.exit(0)
 
         run_dev = getattr(cmds["dev"], "dev")
@@ -104,17 +104,17 @@ def blueberry(command):
             except KeyError:
                 styled_print.debug("running build command as fallback") if has_debug_flag else None
 
-                # command is: blueberry /path/to/files
+                # command is: popcorn /path/to/files
                 run_build = getattr(cmds["build"], "build")
                 run_build(command)
         else:
             styled_print.debug("running install command from no args") if has_debug_flag else None
 
-            # command is: blueberry
+            # command is: popcorn
             # * Run install command
             run_install = getattr(cmds["install"], "install")
             run_install([])
 
 
 if __name__ == '__main__':
-    blueberry(sys.argv[1:])
+    popcorn(sys.argv[1:])

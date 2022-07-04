@@ -4,14 +4,14 @@ import sys
 
 from _utils import styled_print
 
-PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
+PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.kernels"
 
 
-# blueberry remove
-# flags: -d, --dev: remove development berries
+# popcorn remove
+# flags: -d, --dev: remove development kernels
 def remove(args):
     """
-    Used to remove both production berries and development berries.
+    Used to remove both production kernels and development kernels.
 
     :param args: arguments passed to command
     """
@@ -23,12 +23,12 @@ def remove(args):
 
         styled_print.info(f"Removing {args[0]}...")
         if has_dev_flag:
-            if f"{args[0]}{os.sep}.blueberry" in path:
+            if f"{args[0]}{os.sep}.popcorn" in path:
                 if os.name == 'nt':
                     split_paths = path.split(os.pathsep)
-                    removed_berry = f'{args[0]}{os.sep}.blueberry'
+                    removed_kernel = f'{args[0]}{os.sep}.popcorn'
                     os.system(
-                        f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_berry not in i])}'")
+                        f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_kernel not in i])}'")
                 else:
                     rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
                     profile = f"{os.environ['HOME']}{os.sep}.profile"
@@ -36,7 +36,7 @@ def remove(args):
                     if os.path.exists(rcfile):
                         # remove form .shellrc
                         with open(rcfile, 'r+') as f:
-                            data = ''.join([i for i in f if f"{args[0]}{os.sep}.blueberry" not in i])
+                            data = ''.join([i for i in f if f"{args[0]}{os.sep}.popcorn" not in i])
                             f.seek(0)
                             f.write(data)
                             f.truncate()
@@ -44,7 +44,7 @@ def remove(args):
                     else:
                         # remove from .profile
                         with open(profile, 'r+') as f:
-                            data = ''.join([i for i in f if f"{args[0]}{os.sep}.blueberry" not in i])
+                            data = ''.join([i for i in f if f"{args[0]}{os.sep}.popcorn" not in i])
                             f.seek(0)
                             f.write(data)
                             f.truncate()
@@ -52,42 +52,42 @@ def remove(args):
                 styled_print.success(f"Removed {args[0]}")
                 styled_print.info("Please restart the terminal to apply changes.")
             else:
-                styled_print.error("Berry not installed.")
+                styled_print.error("kernel not installed.")
         else:
             if f"{PROD_DIR}{os.sep}{args[0]}" in path:
                 if os.name == 'nt':
                     split_paths = path.split(os.pathsep)
-                    removed_berry = f'{PROD_DIR}{os.sep}{args[0]}'
+                    removed_kernel = f'{PROD_DIR}{os.sep}{args[0]}'
                     os.system(
-                        f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_berry not in i])}'")
+                        f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_kernel not in i])}'")
 
                     try:
                         shutil.rmtree(f"{PROD_DIR}{os.sep}{args[0]}")
                     except FileNotFoundError:
-                        styled_print.error("Berry not found.")
+                        styled_print.error("kernel not found.")
                         sys.exit(0)
                 else:
-                    if args[0] == "pits.sh":
-                        styled_print.error("Not a berry.")
+                    if args[0] == "butter.sh":
+                        styled_print.error("Not a kernel.")
                         sys.exit(0)
 
-                    pits = f'{PROD_DIR}{os.sep}pits.sh'
-                    with open(pits, 'r+') as pit:
-                        data = ''.join([i for i in pit if args[0] not in i])
-                        pit.seek(0)
-                        pit.write(data)
-                        pit.truncate()
-                        pit.close()
+                    buttered = f'{PROD_DIR}{os.sep}butter.sh'
+                    with open(buttered, 'r+') as butter:
+                        data = ''.join([i for i in butter if args[0] not in i])
+                        butter.seek(0)
+                        butter.write(data)
+                        butter.truncate()
+                        butter.close()
 
                     try:
                         shutil.rmtree(f"{PROD_DIR}{os.sep}{args[0]}")
                     except FileNotFoundError:
-                        styled_print.error("Berry not found.")
+                        styled_print.error("kernel not found.")
                         sys.exit(0)
 
                 styled_print.success(f"Removed {args[0]}")
                 styled_print.info("Please restart the terminal to apply changes.")
             else:
-                styled_print.error("Berry not installed.")
+                styled_print.error("kernel not installed.")
     else:
-        styled_print.error("Please specify a berry to remove.")
+        styled_print.error("Please specify a kernel to remove.")

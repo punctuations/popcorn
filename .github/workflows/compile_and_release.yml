@@ -64,20 +64,26 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
       - name: Build with pyinstaller for ${{ matrix.config.os }}
-        run: pyinstaller blueberry.spec
+        run: pyinstaller popcorn.spec
       - name: Copy files to be compressed
-        if: ${{ matrix.config.os != 'windows-latest' }}
         run: |
           cp README.md ./dist
           cp LICENSE ./dist
-          mv ./dist ./blueberry-${{ matrix.config.os }}
+          mv ./dist ./popcorn-${{ matrix.config.os }}
       - name: Archive Files
         if: ${{ matrix.config.os != 'windows-latest' }}
         uses: thedoctor0/zip-release@main
         with:
           type: 'tar'
-          path: './blueberry-${{ matrix.config.os }}'
-          filename: 'blueberry.tar.gz'
+          path: './dist/popcorn-${{ matrix.config.os }}'
+          filename: 'popcorn.tar.gz'
+      - name: Archive Windows Files
+        if: ${{ matrix.config.os == 'windows-latest' }}
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          path: './popcorn-${{ matrix.config.os }}'
+          filename: 'popcorn.zip'
       - name: Upload Release Asset
         if: ${{ matrix.config.os != 'windows-latest' }}
         id: upload-release-asset 
@@ -86,8 +92,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./blueberry.tar.gz
-          asset_name: blueberry-${{ matrix.config.os }}.tar.gz
+          asset_path: ./popcorn.tar.gz
+          asset_name: popcorn-${{ matrix.config.os }}.tar.gz
           asset_content_type: application/gzip
       - name: Upload Release Asset Windows
         if: ${{ matrix.config.os == 'windows-latest' }}
@@ -97,19 +103,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: .\dist\blueberry.exe
-          asset_name: blueberry-${{ matrix.config.os }}.exe
-          asset_content_type: application/x-executable
+          asset_path: ./popcorn.zip
+          asset_name: popcorn-${{ matrix.config.os }}.zip
+          asset_content_type: application/zip
       - name: Generate SHA256 ubuntu
         id: ubuntu-sha256
         if: ${{ matrix.config.os == 'ubuntu-latest' }}
         run: |
-          echo "::set-output name=sha::$(openssl sha256 -binary < ./blueberry.tar.gz | xxd -p)"
+          echo "::set-output name=sha::$(openssl sha256 -binary < ./popcorn.tar.gz | xxd -p)"
       - name: Generate SHA256 macos
         id: macos-sha256
         if: ${{ matrix.config.os == 'macos-latest' }}
         run: |
-          echo "::set-output name=sha::$(openssl sha256 -binary < ./blueberry.tar.gz | xxd -p)"
+          echo "::set-output name=sha::$(openssl sha256 -binary < ./popcorn.tar.gz | xxd -p)"
     outputs:
       ubuntu-256: ${{ steps.ubuntu-sha256.outputs.sha }}
       macos-256: ${{ steps.macos-sha256.outputs.sha }}
@@ -124,14 +130,14 @@ jobs:
           git clone https://github.com/punctuations/homebrew-tap
       - name: modify file
         run: |
-          echo -e '# typed: false\n# frozen_string_literal: true\n\nclass Blueberry < Formula\n  desc "🫐  A command-line tool for command-line tools."\n  homepage "https://github.com/punctuations/blueberry"\n  version "${{ needs.release.outputs.latest }}"\n\n  on_macos do\n    url "https://github.com/punctuations/blueberry/releases/download/${{ needs.release.outputs.latest }}/blueberry-macos-latest.tar.gz"\n    sha256 "${{ needs.compile_exec.outputs.macos-256 }}"\n\n    def install\n      bin.install "blueberry"\n    end\n  end\n\n  on_linux do\n    url "https://github.com/punctuations/blueberry/releases/download/${{ needs.release.outputs.latest }}/blueberry-ubuntu-latest.tar.gz"\n    sha256 "${{ needs.compile_exec.outputs.ubuntu-256 }}"\n\n    def install\n      bin.install "blueberry"\n    end\n  end\nend' > homebrew-tap/blueberry.rb
+          echo -e '# typed: false\n# frozen_string_literal: true\n\nclass Popcorn < Formula\n  desc "🍿  A command-line tool for command-line tools."\n  homepage "https://github.com/punctuations/popcorn"\n  version "${{ needs.release.outputs.latest }}"\n\n  on_macos do\n    url "https://github.com/punctuations/popcorn/releases/download/${{ needs.release.outputs.latest }}/popcorn-macos-latest.tar.gz"\n    sha256 "${{ needs.compile_exec.outputs.macos-256 }}"\n\n    def install\n      bin.install "popcorn"\n    end\n  end\n\n  on_linux do\n    url "https://github.com/punctuations/popcorn/releases/download/${{ needs.release.outputs.latest }}/popcorn-ubuntu-latest.tar.gz"\n    sha256 "${{ needs.compile_exec.outputs.ubuntu-256 }}"\n\n    def install\n      bin.install "popcorn"\n    end\n  end\nend' > homebrew-tap/popcorn.rb
       - name: Update formulae
         uses: dmnemec/copy_file_to_another_repo_action@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source_file: './homebrew-tap/blueberry.rb'
+          source_file: './homebrew-tap/popcorn.rb'
           destination_repo: 'punctuations/homebrew-tap'
           user_email: 'matt@dont-ping.me'
           user_name: 'punctuations'
-          commit_message: 'ci: bump blueberry to ${{ needs.release.outputs.latest }}'
+          commit_message: 'ci: bump popcorn to ${{ needs.release.outputs.latest }}'

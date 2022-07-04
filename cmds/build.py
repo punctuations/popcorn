@@ -9,27 +9,27 @@ import threading
 from _utils import styled_print
 
 config = {}
-berry_name = ""
-berry_type = ""
+kernel_name = ""
+kernel_type = ""
 
 
 def initialize_globals():
-    global berry_name
-    global berry_type
+    global kernel_name
+    global kernel_type
     global config
     try:
-        f = open("./.berryrc")
+        f = open("./.kernelrc")
         config = json.load(f)
         f.close()
     except FileNotFoundError:
-        styled_print.error("Please create a .berryrc file.")
+        styled_print.error("Please create a .kernelrc file.")
         sys.exit(0)
 
-    berry_name = config["berry_name"]
-    berry_type = config["berry_type"]
+    kernel_name = config["kernel_name"]
+    kernel_type = config["kernel_type"]
 
 
-PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
+PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.kernels"
 
 rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
 dotprofile = f"{os.environ['HOME']}{os.sep}.profile"
@@ -41,19 +41,19 @@ def build_thread(output):
     try:
         shutil.rmtree(f"{PROD_DIR}{os.sep}{output}")
         os.mkdir(PROD_DIR)
-        if berry_type.lower() == "unpacked":
+        if kernel_type.lower() == "unpacked":
             os.mkdir(f"{PROD_DIR}{os.sep}{output}")
     except FileExistsError:
         pass
     except FileNotFoundError:
         pass
     except KeyError:
-        styled_print.error("Please include a berry_name in the config.")
+        styled_print.error("Please include a kernel_name in the config.")
         sys.exit(0)
 
     try:
         # run seed_cmd
-        if berry_type.lower() == "unpacked":
+        if kernel_type.lower() == "unpacked":
             try:
                 os.mkdir(f"{PROD_DIR}{os.sep}{output}")
             except FileExistsError:
@@ -64,23 +64,23 @@ def build_thread(output):
             seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(f"{PROD_DIR}", config["seed_cmd"])
         exit_status = os.WEXITSTATUS(os.system(seed_cmd))
 
-        # create unpacked berry with unpacked stem.
-        if berry_type.lower() == "unpacked":
+        # create unpacked kernel with unpacked stem.
+        if kernel_type.lower() == "unpacked":
             try:
-                arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_stem"])
-                unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE) \
+                arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_husk"])
+                unpacked_husk = re.compile(re.escape("@local"), re.IGNORECASE) \
                     .sub(f"{PROD_DIR}{os.sep}{output[:-1] if output.endswith('/') else output}", arg_stem)
-                with open(f"{PROD_DIR}{os.sep}{output}{berry_name}", "w") as berry:
-                    berry.write(f"#!/bin/bash\n{unpacked_stem}")
-                    berry.close()
+                with open(f"{PROD_DIR}{os.sep}{output}{kernel_name}", "w") as kernel:
+                    kernel.write(f"#!/bin/bash\n{unpacked_husk}")
+                    kernel.close()
             except KeyError:
-                styled_print.error("Please include the unpacked_stem in the config.")
-                berry.close()
+                styled_print.error("Please include the unpacked_husk in the config.")
+                kernel.close()
                 sys.exit(0)
 
         # change permissions
         try:
-            os.chmod(os.path.join(PROD_DIR, output if berry_type.lower() == "packed" else f"{output}{berry_name}"),
+            os.chmod(os.path.join(PROD_DIR, output if kernel_type.lower() == "packed" else f"{output}{kernel_name}"),
                      stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
         except FileNotFoundError:
             styled_print.error("Unable to amend permission of file; file not found.")
@@ -95,34 +95,34 @@ def build_thread(output):
 
     if os.name != "nt":
         try:
-            pits = open(f'{PROD_DIR}{os.sep}pits.sh', 'r')
-            lines = pits.readlines()
-            pits.close()
+            buttered = open(f'{PROD_DIR}{os.sep}butter.sh', 'r')
+            lines = buttered.readlines()
+            buttered.close()
 
-            if berry_type == "packed":
+            if kernel_type == "packed":
                 if f"export PATH=$PATH{os.pathsep}{PROD_DIR}\n" not in lines:
-                    with open(f'{PROD_DIR}{os.sep}pits.sh', "a") as builds:
+                    with open(f'{PROD_DIR}{os.sep}butter.sh', "a") as builds:
                         builds.write(f"export PATH=$PATH{os.pathsep}{PROD_DIR}\n")
                         builds.close()
             else:
                 if f"export PATH=$PATH{os.pathsep}{PROD_DIR}{os.sep}{output}\n" not in lines:
-                    with open(f'{PROD_DIR}{os.sep}pits.sh', "a") as builds:
+                    with open(f'{PROD_DIR}{os.sep}butter.sh', "a") as builds:
                         builds.write(f"export PATH=$PATH{os.pathsep}{PROD_DIR}{os.sep}{output}\n")
                         builds.close()
         except FileNotFoundError:
-            with open(f'{PROD_DIR}{os.sep}pits.sh', "w") as pit:
-                if berry_type == "packed":
-                    pit.write(f"#!/bin/bash\nexport PATH=$PATH{os.pathsep}{PROD_DIR}\n")
+            with open(f'{PROD_DIR}{os.sep}butter.sh', "w") as butter:
+                if kernel_type == "packed":
+                    butter.write(f"#!/bin/bash\nexport PATH=$PATH{os.pathsep}{PROD_DIR}\n")
                 else:
-                    pit.write(f"#!/bin/bash\nexport PATH=$PATH{os.pathsep}{PROD_DIR}{os.sep}{output}\n")
-                pit.close()
+                    butter.write(f"#!/bin/bash\nexport PATH=$PATH{os.pathsep}{PROD_DIR}{os.sep}{output}\n")
+                butter.close()
     else:
-        if PROD_DIR not in os.environ["PATH"] and berry_type.lower() == "packed":
+        if PROD_DIR not in os.environ["PATH"] and kernel_type.lower() == "packed":
             path_init = True
             os.system(f"setx PATH '%PATH%{os.pathsep}{PROD_DIR}'")
             styled_print.success("Added to path")
 
-        if f"{PROD_DIR}{os.sep}{output}" not in os.environ["PATH"] and berry_type.lower() == "unpacked":
+        if f"{PROD_DIR}{os.sep}{output}" not in os.environ["PATH"] and kernel_type.lower() == "unpacked":
             path_init = True
             os.system(f"setx PATH '%PATH%{os.pathsep}{PROD_DIR}{output}'")
             styled_print.success("Added to path")
@@ -132,18 +132,18 @@ def build_thread(output):
             shellrc = open(rcfile, "r")
             rclines = shellrc.read()
             shellrc.close()
-            if f". \"$HOME{os.sep}.berries{os.sep}pits.sh\"\n" not in rclines:
+            if f". \"$HOME{os.sep}.kernels{os.sep}butter.sh\"\n" not in rclines:
                 with open(rcfile, "w") as init:
-                    init.write(f". \"$HOME{os.sep}.berries{os.sep}pits.sh\"\n")
+                    init.write(f". \"$HOME{os.sep}.kernels{os.sep}butter.sh\"\n")
                     init.write(rclines)
                     init.close()
         else:
             profile = open(dotprofile, "r")
             proflines = profile.read()
             profile.close()
-            if f". \"$HOME{os.sep}.berries{os.sep}pits.sh\"\n" not in proflines:
+            if f". \"$HOME{os.sep}.kernels{os.sep}butter.sh\"\n" not in proflines:
                 with open(dotprofile, "w") as init:
-                    init.write(f". \"$HOME{os.sep}.berries{os.sep}pits.sh\"\n")
+                    init.write(f". \"$HOME{os.sep}.kernels{os.sep}butter.sh\"\n")
                     init.write(proflines)
                     init.close()
         if path_init:
@@ -155,14 +155,14 @@ def build_thread(output):
                 else:
                     os.system(f"source {dotprofile}")
 
-    styled_print.success(f"Successfully built {berry_name}.")
+    styled_print.success(f"Successfully built {kernel_name}.")
 
 
-# blueberry build
-# flags: -o, --output: change the output directory of the berry
+# popcorn build
+# flags: -o, --output: change the output directory of the kernel
 def build(args):
     """
-    Used to create production-level berries.
+    Used to create production-level kernels.
 
     :param args: arguments passed to command
     """
@@ -170,7 +170,7 @@ def build(args):
 
     output = ["-o", "--output"]
     # when file is placed here make sure to set path variable to file containing accessible target
-    # ex. (unpacked) export PATH = $PATH:$HOME/.local/bin/blueberry
+    # ex. (unpacked) export PATH = $PATH:$HOME/.local/bin/popcorn
     # ex. (packed) export PATH  = $PATH:$HOME/.local/bin
     has_output_flag = [element for element in output if (element in args)]
     output_index = args.index(has_output_flag[0]) if len(has_output_flag) >= 1 else 0
@@ -186,16 +186,16 @@ def build(args):
             sys.exit(0)
     else:
         try:
-            output = berry_name
+            output = kernel_name
         except KeyError:
-            styled_print.error("Please include a berry_name in the config.")
+            styled_print.error("Please include a kernel_name in the config.")
             sys.exit(0)
 
     try:
-        if berry_type.lower() == "unpacked":
+        if kernel_type.lower() == "unpacked":
             output = output + os.sep
     except KeyError:
-        styled_print.error("Please include the berry_type in the config.")
+        styled_print.error("Please include the kernel_type in the config.")
         sys.exit(0)
 
     thread = threading.Thread(target=build_thread, args=(output,))

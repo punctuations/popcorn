@@ -11,7 +11,7 @@ build
 dist
 
 # internal
-.blueberry
+.popcorn
 
 # my list
 **/TODO

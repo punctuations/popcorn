@@ -16,32 +16,32 @@ from _utils import styled_print
 
 listen = ["-l", "--listen"]
 
-DEV_DIR = f"{os.path.realpath(os.getcwd())}{os.sep}.blueberry"
-PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.berries"
+DEV_DIR = f"{os.path.realpath(os.getcwd())}{os.sep}.popcorn"
+PROD_DIR = f"{os.path.expanduser('~')}{os.sep}.kernels"
 
 last_event = {"message": False}
 event_delta = timedelta(seconds=int(2))
 
 config = {}
-berry_name = ""
-berry_type = ""
+kernel_name = ""
+kernel_type = ""
 
 
 def initialize_globals():
     global config
-    global berry_name
-    global berry_type
+    global kernel_name
+    global kernel_type
 
     try:
-        f = open("./.berryrc")
+        f = open("./.kernelrc")
         config = json.load(f)
         f.close()
     except FileNotFoundError:
-        styled_print.error("Please create a .berryrc file.")
+        styled_print.error("Please create a .kernelrc file.")
         sys.exit(0)
 
-    berry_name = config["berry_name"]
-    berry_type = config["berry_type"]
+    kernel_name = config["kernel_name"]
+    kernel_type = config["kernel_type"]
 
 
 rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
@@ -69,27 +69,27 @@ def thread_compile():
             seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(f"{DEV_DIR}", config["seed_cmd"])
             exit_status = os.WEXITSTATUS(os.system(seed_cmd))
 
-            # create unpacked berry.
+            # create unpacked kernel.
             try:
-                if berry_type.lower() == "unpacked":
+                if kernel_type.lower() == "unpacked":
                     try:
-                        arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_stem"])
-                        unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE).sub(DEV_DIR, arg_stem)
-                        with open(f"{DEV_DIR}{os.sep}{berry_name}", "w") as berry:
-                            berry.write(f"#!/bin/bash\n{unpacked_stem}")
-                            berry.close()
+                        arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_husk"])
+                        unpacked_husk = re.compile(re.escape("@local"), re.IGNORECASE).sub(DEV_DIR, arg_stem)
+                        with open(f"{DEV_DIR}{os.sep}{kernel_name}", "w") as kernel:
+                            kernel.write(f"#!/bin/bash\n{unpacked_husk}")
+                            kernel.close()
                     except KeyError:
-                        styled_print.error("Please include the unpacked_stem in the config.")
-                        berry.close()
+                        styled_print.error("Please include the unpacked_husk in the config.")
+                        kernel.close()
                         sys.exit(0)
 
             except KeyError:
-                styled_print.error("Please include the berry_type in the config.")
+                styled_print.error("Please include the kernel_type in the config.")
                 sys.exit(0)
 
             # edit permissions to all
             try:
-                os.chmod(os.path.join(DEV_DIR, berry_name), stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
+                os.chmod(os.path.join(DEV_DIR, kernel_name), stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
             except FileNotFoundError:
                 styled_print.error("Unable to amend permission of file; file not found.")
                 sys.exit(0)
@@ -102,14 +102,14 @@ def thread_compile():
             styled_print.error("Please enter in a seed_cmd")
             sys.exit(0)
 
-        # rename berry to dev branch.
+        # rename kernel to dev branch.
         try:
-            dev_branch = config['advanced']['dev_branch']
+            dev_stalk = config['advanced']['dev_stalk']
 
-            os.rename(f"{DEV_DIR}{os.sep}{berry_name}",
-                      f"{DEV_DIR}{os.sep}{berry_name}{config['advanced']['dev_branch'] if dev_branch else '-dev'}")
+            os.rename(f"{DEV_DIR}{os.sep}{kernel_name}",
+                      f"{DEV_DIR}{os.sep}{kernel_name}{config['advanced']['dev_stalk'] if dev_stalk else '-dev'}")
         except FileNotFoundError:
-            styled_print.error(f"Please have a file named {berry_name} as entry point.")
+            styled_print.error(f"Please have a file named {kernel_name} as entry point.")
             sys.exit(0)
 
 
@@ -130,7 +130,7 @@ class Handler(FileSystemEventHandler):
         except subprocess.CalledProcessError:
             ignored = False
 
-        if event.src_path.split("/")[-1] == ".berryrc":
+        if event.src_path.split("/")[-1] == ".kernelrc":
             last_event["message"] = True
 
         if not ignored:
@@ -139,25 +139,25 @@ class Handler(FileSystemEventHandler):
             thread.start()
 
 
-# blueberry dev
+# popcorn dev
 # flags: -l, --listen: set the dir/file that is being watched for changes
 def dev(args):
     """
-    Used to create development berries.
+    Used to create development kernels.
 
     :param args: arguments passed to command
     """
     initialize_globals()
 
     if DEV_DIR not in os.environ["PATH"]:
-        styled_print.warning("Development berry not installed.\n\t\tplease try: blueberry install --dev")
+        styled_print.warning("Development kernel not installed.\n\t\tplease try: popcorn install --dev")
         sys.exit(0)
 
     has_listen_flag = [element for element in listen if (element in args)]
     listen_index = args.index(has_listen_flag[0]) if len(has_listen_flag) >= 1 else 0
 
-    if not berry_name:
-        styled_print.error("Please enter a berry_name in config.")
+    if not kernel_name:
+        styled_print.error("Please enter a kernel_name in config.")
         sys.exit(0)
 
     # initialize development env
@@ -168,27 +168,27 @@ def dev(args):
         seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(DEV_DIR, config["seed_cmd"])
         exit_status = os.WEXITSTATUS(os.system(seed_cmd))
 
-        # create packed berry.
+        # create packed kernel.
         try:
-            if berry_type.lower() == "unpacked":
+            if kernel_type.lower() == "unpacked":
                 try:
-                    arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_stem"])
-                    unpacked_stem = re.compile(re.escape("@local"), re.IGNORECASE).sub(DEV_DIR, arg_stem)
-                    with open(f"{DEV_DIR}{os.sep}{berry_name}", "w") as berry:
-                        berry.write(f"#!/bin/bash\n{unpacked_stem}")
-                        berry.close()
+                    arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_husk"])
+                    unpacked_husk = re.compile(re.escape("@local"), re.IGNORECASE).sub(DEV_DIR, arg_stem)
+                    with open(f"{DEV_DIR}{os.sep}{kernel_name}", "w") as kernel:
+                        kernel.write(f"#!/bin/bash\n{unpacked_husk}")
+                        kernel.close()
                 except KeyError:
-                    styled_print.error("Please include the unpacked_stem in the config.")
-                    berry.close()
+                    styled_print.error("Please include the unpacked_husk in the config.")
+                    kernel.close()
                     sys.exit(0)
 
         except KeyError:
-            styled_print.error("Please include the berry_type in the config.")
+            styled_print.error("Please include the kernel_type in the config.")
             sys.exit(0)
 
         # edit permissions to all
         try:
-            os.chmod(os.path.join(DEV_DIR, berry_name), stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
+            os.chmod(os.path.join(DEV_DIR, kernel_name), stat.S_IRWXO | stat.S_IRWXU | stat.S_IRWXG)
         except FileNotFoundError:
             styled_print.error("Unable to amend permission of file; file not found.")
             sys.exit(0)
@@ -202,13 +202,13 @@ def dev(args):
         styled_print.error("Please enter in a seed_cmd")
         sys.exit(0)
 
-    # rename berry to dev branch.
+    # rename kernel to dev branch.
     try:
-        dev_branch = config['advanced']['dev_branch']
-        os.rename(f"{DEV_DIR}{os.sep}{berry_name}",
-                  f"{DEV_DIR}{os.sep}{berry_name}{config['advanced']['dev_branch'] if dev_branch else '-dev'}")
+        dev_stalk = config['advanced']['dev_stalk']
+        os.rename(f"{DEV_DIR}{os.sep}{kernel_name}",
+                  f"{DEV_DIR}{os.sep}{kernel_name}{config['advanced']['dev_stalk'] if dev_stalk else '-dev'}")
     except FileNotFoundError:
-        styled_print.error(f"Please have a file named {berry_name} as entry point.")
+        styled_print.error(f"Please have a file named {kernel_name} as entry point.")
         sys.exit(0)
 
     if has_listen_flag:
