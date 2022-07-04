@@ -27,8 +27,9 @@ def remove(args):
                 if os.name == 'nt':
                     split_paths = path.split(os.pathsep)
                     removed_kernel = f'{args[0]}{os.sep}.popcorn'
-                    os.system(
-                        f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_kernel not in i])}'")
+                    fixed_path = f'{os.pathsep}'.join([i for i in split_paths if removed_kernel not in i])
+                    os.system(f"[Environment]::SetEnvironmentVariable('PATH', '{fixed_path}', 'User')")
+                    os.system(f"$env:PATH = '{fixed_path}'")
                 else:
                     rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
                     profile = f"{os.environ['HOME']}{os.sep}.profile"
@@ -58,8 +59,9 @@ def remove(args):
                 if os.name == 'nt':
                     split_paths = path.split(os.pathsep)
                     removed_kernel = f'{PROD_DIR}{os.sep}{args[0]}'
-                    os.system(
-                        f"setx PATH '{f'{os.pathsep}'.join([i for i in split_paths if removed_kernel not in i])}'")
+                    fixed_path = f'{os.pathsep}'.join([i for i in split_paths if removed_kernel not in i])
+                    os.system(f"[Environment]::SetEnvironmentVariable('PATH', '{fixed_path}', 'User')")
+                    os.system(f"$env:PATH = '{fixed_path}'")
 
                     try:
                         shutil.rmtree(f"{PROD_DIR}{os.sep}{args[0]}")

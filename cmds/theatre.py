@@ -128,12 +128,14 @@ def build_thread(output, location, config):
         # is windows, add to path
         if PROD_DIR not in os.environ["PATH"] and kernel_type.lower() == "packed":
             path_init = True
-            os.system(f"setx PATH '%PATH%{os.pathsep}{PROD_DIR}'")
+            os.system(f"[Environment]::SetEnvironmentVariable('PATH', '$env:PATH{os.pathsep}{PROD_DIR}', 'User')")
+            os.system(f"$env:PATH += '{os.pathsep}{PROD_DIR}'")
             styled_print.success("Added to path")
 
         if f"{PROD_DIR}{os.sep}{output}" not in os.environ["PATH"] and kernel_type.lower() == "unpacked":
             path_init = True
-            os.system(f"setx PATH '%PATH%{os.pathsep}{PROD_DIR}{output}'")
+            os.system(f"[Environment]::SetEnvironmentVariable('PATH', '$env:PATH{os.pathsep}{PROD_DIR}{output}', 'User')")
+            os.system(f"$env:PATH += '{os.pathsep}{PROD_DIR}{output}'")
             styled_print.success("Added to path")
 
     # add buttered execution to rcfile/dotprofile

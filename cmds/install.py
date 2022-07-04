@@ -53,7 +53,8 @@ def install(args):
         if DEV_DIR not in os.environ["PATH"]:
             if os.name == 'nt':
                 # change path
-                os.system(f"setx PATH '%PATH%{os.pathsep}{DEV_DIR}'")
+                os.system(f"[Environment]::SetEnvironmentVariable('PATH', '$env:PATH{os.pathsep}{DEV_DIR}', 'User')")
+                os.system(f"$env:PATH += '{os.pathsep}{DEV_DIR}'")
                 styled_print.success("Please run popcorn source to apply changes.")
             else:
                 # edit .shellrc or .profile file
