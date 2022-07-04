@@ -17,7 +17,7 @@ Invoke-WebRequest $download -Out $zip # Download latest version of instl
 Expand-Archive $zip -DestinationPath "$Env:TEMP\popcorn-download" -Force # Unpack the download
 
 # Move to ~/popcorn
-New-Item $destination -ItemType Directory -Force
+New-Item $Env:TEMP\popcorn-download -ItemType Directory -Force
 cd $Env:TEMP\popcorn-download if ($?) { move popcorn.exe "$HOME\.popcorn\" }
 
 # Remove instl and temorary files
