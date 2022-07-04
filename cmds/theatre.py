@@ -97,7 +97,7 @@ def build_thread(output, location, config):
             styled_print.success("Compiled successfully!")
 
     except KeyError:
-        styled_print.error("Orchard does not contain a seed_cmd")
+        styled_print.error("Theatre does not contain a seed_cmd")
         sys.exit(0)
 
     # add to buttered
@@ -176,7 +176,7 @@ def build(config, is_unpacked, location):
     try:
         output = config["kernel_name"]
     except KeyError:
-        styled_print.error("Orchard has no kernel_name.")
+        styled_print.error("Theatre has no kernel_name.")
         sys.exit(0)
 
     if is_unpacked:
@@ -188,9 +188,9 @@ def build(config, is_unpacked, location):
         thread.start()
 
 
-# popcorn orchard
+# popcorn theatre
 # flags: -u, --unpacked: get a unpacked remote kernel; --url: specify the download URL
-def orchard(args):
+def theatre(args):
     """
     Used to get remote kernels.
 
@@ -226,7 +226,7 @@ def orchard(args):
                 config = json.load(f)
                 f.close()
             except FileNotFoundError:
-                styled_print.error("Orchard does not contain .kernelrc")
+                styled_print.error("Theatre does not contain .kernelrc")
                 shutil.rmtree(f"{TMP_DIR}url-{hash_name}")
                 sys.exit(0)
 
@@ -269,7 +269,7 @@ def orchard(args):
                 config = json.load(f)
                 f.close()
             except FileNotFoundError:
-                styled_print.error("Orchard does not contain .kernelrc")
+                styled_print.error("Theatre does not contain .kernelrc")
                 shutil.rmtree(f"{TMP_DIR}{args}")
                 sys.exit(0)
 
@@ -294,4 +294,4 @@ def orchard(args):
                 styled_print.success(f"Successfully added {config['kernel_name']}")
 
     else:
-        styled_print.error("Please specify an orchard.")
+        styled_print.error("Please specify a Theatre.")
