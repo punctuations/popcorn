@@ -134,7 +134,8 @@ def build_thread(output, location, config):
 
         if f"{PROD_DIR}{os.sep}{output}" not in os.environ["PATH"] and kernel_type.lower() == "unpacked":
             path_init = True
-            os.system(f"[Environment]::SetEnvironmentVariable('PATH', '$env:PATH{os.pathsep}{PROD_DIR}{output}', 'User')")
+            os.system(
+                f"[Environment]::SetEnvironmentVariable('PATH', '$env:PATH{os.pathsep}{PROD_DIR}{output}', 'User')")
             os.system(f"$env:PATH += '{os.pathsep}{PROD_DIR}{output}'")
             styled_print.success("Added to path")
 
