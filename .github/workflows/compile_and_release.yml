@@ -75,7 +75,7 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: 'tar'
-          path: './dist/popcorn-${{ matrix.config.os }}'
+          path: './popcorn-${{ matrix.config.os }}'
           filename: 'popcorn.tar.gz'
       - name: Archive Windows Files
         if: ${{ matrix.config.os == 'windows-latest' }}
