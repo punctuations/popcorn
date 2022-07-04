@@ -18,7 +18,8 @@ Expand-Archive $zip -DestinationPath "$Env:TEMP\popcorn-download" -Force # Unpac
 
 # Move to ~/popcorn
 New-Item $Env:TEMP\popcorn-download -ItemType Directory -Force
-cd $Env:TEMP\popcorn-download if ($?) { move popcorn.exe "$HOME\.popcorn\" }
+cd $Env:TEMP\popcorn-download
+if ($?) { move popcorn.exe "$HOME\.popcorn\" }
 
 # Remove instl and temorary files
 Remove-Item "$Env:TEMP\popcorn-download" -Recurse -Force -ErrorAction SilentlyContinue # Remove popcorn
