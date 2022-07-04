@@ -1,4 +1,4 @@
-# 🍿 popcorn
+# 🍿 Popcorn
 ### Say goodbye to complicated installation instructions and build steps.
 #### So easy you can sit back and enjoy some popcorn.
 ![](demo.gif)
