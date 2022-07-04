@@ -19,6 +19,7 @@ Expand-Archive $zip -DestinationPath "$Env:TEMP\popcorn-download" -Force # Unpac
 # Move to ~/popcorn
 New-Item $Env:TEMP\popcorn-download -ItemType Directory -Force
 cd $Env:TEMP\popcorn-download
+echo $HOME
 New-Item $HOME\.popcorn\ -ItemType Directory -Force
 if ($?) { move $Env:TEMP\popcorn-download\popcorn-windows-latest\popcorn.exe $HOME\.popcorn\ }
 
