@@ -28,7 +28,7 @@ Remove-Item "$name.zip" -Recurse -Force -ErrorAction SilentlyContinue # Remove t
 if ([System.IO.Directory]::Exists("$HOME\.popcorn")) {
     # Update system path
     [Environment]::SetEnvironmentVariable("PATH", "$env:PATH;$HOME\.popcorn", "User")
-    echo "[38;5;48m 🍿  popcorn successfully installed, please restart terminal for changes to apply. [0;0m"
+    echo "[38;5;10m 🍿  Popcorn successfully installed, please restart terminal for changes to apply. [0;0m"
 } else {
     echo "[38;5;1m error - [0;0m something went wrong while installing."
 }

@@ -44,7 +44,7 @@ if ! [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
 fi
 
 if [[ -f "$HOME/.local/bin/popcorn" ]]; then
-  echo -e  "[38;5;48m 🍿  popcorn successfully installed, please restart terminal for changes to apply. [0;0m"
+  echo -e  "[38;5;10m 🍿  popcorn successfully installed, please restart terminal for changes to apply. [0;0m"
 else
   echo -e "[38;5;1m error - [0;0m something went wrong while installing."
 fi
