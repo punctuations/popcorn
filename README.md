@@ -45,7 +45,7 @@ brew install punctuations/tap/popcorn
 
 **Windows:**
 ```powershell
-iwr -useb cmdf.at/popcorn@windows | iex
+iwr -useb raw.githubusercontent.com/punctuations/popcorn/main/install.ps1 | iex
 ```
 or with Chocolately
 ```powershell
