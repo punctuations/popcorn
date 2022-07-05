@@ -63,7 +63,7 @@ def popcorn(command):
     if has_alias_flag:
         styled_print.debug("running alias command") if has_debug_flag else None
 
-        print("function kernel () { eval $(popcorn $@); }")
+        print("function pop () { eval $(popcorn $@); }")
     elif has_version_flag:
         f = open(resource_path("blame.json"))
         blame = json.load(f)
