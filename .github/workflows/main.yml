@@ -13,5 +13,5 @@ jobs:
       with:
         python-root: '.'
         flake8-flags: '--max-line-length 120'
-        mypy-flags: '--ignore-missing-imports'
+        mypy-flags: '--ignore-missing-imports --install-types'
         fail-on-isort: true
