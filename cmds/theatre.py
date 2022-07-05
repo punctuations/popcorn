@@ -3,9 +3,12 @@ import os
 import re
 import shutil
 import stat
+import subprocess
 import sys
 import threading
 from zipfile import ZipFile
+
+import requests
 
 from _utils import styled_print
 
@@ -203,10 +206,18 @@ def theatre(args):
     has_url_flag = [element for element in url if (element in args)]
     url_index = args.index(has_url_flag[0]) if len(has_url_flag) >= 1 else 0
 
+    has_target_ver = False
+    ver = None
+
     if len(args) >= 1:
-        if not has_url_flag and len(args.split("/")) != 2:
+        if not has_url_flag and len(args[0].split("/")) != 2:
             styled_print.error("Please follow the scheme of user/repo")
             sys.exit(0)
+
+        if not has_url_flag and "@" in args[0]:
+            ver = args[0].split("@")[1]
+            args[0] = args[0].split("@")[0]
+            has_target_ver = True
 
         if has_url_flag:
             hash_name = args[url_index + 1].encode('utf-8').hex()
@@ -251,43 +262,63 @@ def theatre(args):
                 styled_print.success(f"Successfully added {config['kernel_name']}")
 
         else:
-            # unpacked from github.
-            if os.name == 'nt':
-                os.system("iwr")
-            else:
-                release = 'get release version here'
-                os.system(f"curl --silent https://github.com/{args[url_index + 1]}/releases/download/{release}/kernel"
-                          f".tar.gz -L --output {TMP_DIR}{args}.tar.gz")
-            print("fetched from github.")
+            # from github.
+            file_name = '@'.join(args[0].split('/'))
+            if not has_target_ver:
+                release = requests.get(f'https://api.github.com/repos/{args[0]}/tags').json()
+                ver = release[0]['name']
 
-            with ZipFile(f'{TMP_DIR}{args}.tar.gz', "r") as zip_obj:
-                zip_obj.extractall(f'{TMP_DIR}{args}')
+            if os.name == 'nt':
+                file_ext = '.zip'
+                try:
+                    subprocess.run(f"Invoke-WebRequest https://github.com/{args[0]}/releases/download/{ver}/kernel"
+                                   f"{file_ext} -Out {TMP_DIR}{file_name}{file_ext}", shell=True, check=True)
+                except (OSError, subprocess.SubprocessError, subprocess.CalledProcessError) as e:
+                    print(e)
+                    styled_print.error("An error occurred while getting the theatre's kernel.")
+                    sys.exit(0)
+
+            else:
+                file_ext = '.tar.gz'
+                try:
+                    subprocess.run(f"curl --silent https://github.com/{args[0]}/releases/download/{ver}/kernel"
+                                   f"{file_ext} -L --output {TMP_DIR}{file_name}{file_ext}", shell=True, check=True)
+                except (OSError, subprocess.SubprocessError, subprocess.CalledProcessError) as e:
+                    print(e)
+                    styled_print.error("An error occurred while getting the theatre's kernel.")
+                    sys.exit(0)
+
+            with ZipFile(f'{TMP_DIR}{file_name}{file_ext}', "r") as zip_obj:
+                zip_obj.extractall(f'{TMP_DIR}{file_name}')
 
             # load .kernelrc
             try:
-                f = open(f"{TMP_DIR}{args}{os.sep}.kernelrc")
+                f = open(f"{TMP_DIR}{file_name}{os.sep}.kernelrc")
                 config = json.load(f)
                 f.close()
             except FileNotFoundError:
                 styled_print.error("Theatre does not contain .kernelrc")
-                shutil.rmtree(f"{TMP_DIR}{args}")
+                shutil.rmtree(f"{TMP_DIR}{file_name}")
+                shutil.rmtree(f"{TMP_DIR}{file_name}{file_ext}")
                 sys.exit(0)
 
             # check to see if it is compatible with current os
             os_type = 'windows' if os.name == 'nt' else 'mac' if sys.platform == 'darwin' else 'linux'
             if os_type not in config["os"]:
                 styled_print.warning("Unsupported os type.")
-                shutil.rmtree(f"{TMP_DIR}{args}")
+                shutil.rmtree(f"{TMP_DIR}{file_name}")
+                shutil.rmtree(f"{TMP_DIR}{file_name}{file_ext}")
                 sys.exit(0)
 
             # find .kernelrc and make sure the kernel names aren't a conflict.
             if os.path.exists(f"{PROD_DIR}{os.sep}{config['kernel_name']}"):
                 styled_print.warning("A kernel with that name already exists.")
                 # delete the conflicted kernel here.
-                shutil.rmtree(f"{TMP_DIR}{args}")
+                shutil.rmtree(f"{TMP_DIR}{file_name}")
+                shutil.rmtree(f"{TMP_DIR}{file_name}{file_ext}")
                 sys.exit(0)
 
-            build(config, has_unpacked_flag, location=f"{args}")
+            build(config, has_unpacked_flag, location=f"{args[0]}")
             if os.name != 'nt':
                 install(config)
             else:
