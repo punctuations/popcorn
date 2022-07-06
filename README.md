@@ -27,7 +27,7 @@
   - `unpacked`: Refers to the type of output as a multi-file structure from the filesystem.
 - `unpacked_husk`: The command to enter the main file in an unpacked kernel. (See example [config](https://github.com/punctuations/popcorn/blob/main/.kernelrc))
 - `seed_cmd`: The command to compile the kernel.
-- `dev_stalk`: The naming scheme given to a development kernel.
+- `dev_node`: The naming scheme given to a development kernel.
 
 #### [Back to contents](#contents)
 
@@ -85,7 +85,7 @@ Using the output flag will fix any conflicts between kernel names by storing it 
 ##### Dev:
 The dev command will launch a development environment which will listen to the specified directory for any changes and hot reload the development version of the command, to test out the command up-to-date and without having to manually compile every time.
 
-The development command will be accessible through the `{kernel_name}{dev_stalk}`, for example: `popcorn-dev`
+The development command will be accessible through the `{kernel_name}{dev_node}`, for example: `popcorn-dev`
 
 Ex.
 ```
@@ -176,7 +176,7 @@ The config (.kernelrc) is used for all kernels, and is required, you can use the
     "seed_cmd": "cp -r * @dest",
     "advanced": {
         "os": ["mac", "windows", "linux"],
-        "dev_stalk":  "-dev"
+        "dev_node":  "-dev"
     }
 }
 ```
@@ -189,7 +189,7 @@ The config (.kernelrc) is used for all kernels, and is required, you can use the
 - `unpacked_husk`: The unpacked_husk is optional and only used if the program is an unpacked type, this will be the command that is put into the entry point to the rest of the files.
 - `dev_cmd`: The command that is ran when `popcorn -d` or `popcorn --dev` is run.
 - `seed_cmd`: The command that transfers (or compiles) all files into the `@dest`
-- `advanced/dev_stalk`: The naming scheme applied for the development command.
+- `advanced/dev_node`: The naming scheme applied for the development command.
 
 ##### Variables:
 - `@local`: used for the local directory for the program.

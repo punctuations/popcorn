@@ -104,10 +104,10 @@ def thread_compile():
 
         # rename kernel to dev branch.
         try:
-            dev_stalk = config['advanced']['dev_stalk']
+            dev_node = config['advanced']['dev_node']
 
             os.rename(f"{DEV_DIR}{os.sep}{kernel_name}",
-                      f"{DEV_DIR}{os.sep}{kernel_name}{config['advanced']['dev_stalk'] if dev_stalk else '-dev'}")
+                      f"{DEV_DIR}{os.sep}{kernel_name}{config['advanced']['dev_node'] if dev_node else '-dev'}")
         except FileNotFoundError:
             styled_print.error(f"Please have a file named {kernel_name} as entry point.")
             sys.exit(0)
@@ -204,9 +204,9 @@ def dev(args):
 
     # rename kernel to dev branch.
     try:
-        dev_stalk = config['advanced']['dev_stalk']
+        dev_node = config['advanced']['dev_node']
         os.rename(f"{DEV_DIR}{os.sep}{kernel_name}",
-                  f"{DEV_DIR}{os.sep}{kernel_name}{config['advanced']['dev_stalk'] if dev_stalk else '-dev'}")
+                  f"{DEV_DIR}{os.sep}{kernel_name}{config['advanced']['dev_node'] if dev_node else '-dev'}")
     except FileNotFoundError:
         styled_print.error(f"Please have a file named {kernel_name} as entry point.")
         sys.exit(0)

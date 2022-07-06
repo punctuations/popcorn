@@ -8,11 +8,11 @@ def create_config(has_packed):
         if has_packed:
             config.write(f'{{\n"kernel_name": "{os.getcwd().split(os.sep)[-1]}",\n"kernel_type": "packed",'
                          f'\n"dev_cmd": "popcorn dev",\n"seed_cmd": "go build -o @dest",\n"advanced": {{'
-                         f'\n"dev_stalk":  "-dev"\n}}\n}}')
+                         f'\n"dev_node":  "-dev"\n}}\n}}')
         else:
             config.write(f'{{\n\t"kernel_name": "{os.getcwd().split(os.sep)[-1]}",\n\t"kernel_type": "unpacked",'
                          f'\n\t"unpacked_husk": "python @local/popcorn.py @args",\n\t"dev_cmd": "popcorn dev",'
-                         f'\n\t"seed_cmd": "cp -r * @dest",\n\t"advanced": {{\n\t\t"dev_stalk":  "-dev"\n\t}}\n}}')
+                         f'\n\t"seed_cmd": "cp -r * @dest",\n\t"advanced": {{\n\t\t"dev_node":  "-dev"\n\t}}\n}}')
         config.close()
 
 

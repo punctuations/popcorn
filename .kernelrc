@@ -6,6 +6,6 @@
     "seed_cmd": "cp -r * @dest",
     "advanced": {
         "os": ["mac", "windows", "linux"],
-        "dev_stalk":  "-dev"
+        "dev_node":  "-dev"
     }
 }
