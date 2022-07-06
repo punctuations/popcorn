@@ -92,6 +92,12 @@ def popcorn(command):
 
         run_help = getattr(cmds["help"], "help")
         run_help(command[help_index + 1:])
+    elif command[cmd_with_debug] == 'theater':
+        # alias for theatre
+        styled_print.debug("running theatre command") if has_debug_flag else None
+
+        run_install = getattr(cmds["theatre"], "theatre")
+        run_install(command[cmd_with_debug + 1:] if command[cmd_with_debug + 1:] != ['--debug'] else [])
     else:
         # if argument is passed in
         if len(command) >= 1:
