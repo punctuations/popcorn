@@ -10,6 +10,7 @@
 - [Updating](#updating)
 - [How it works](#how-it-works)
 - [Commands](#commands)
+- [Kernel Examples](#kernel-examples)
 - [Config](#config)
 
 ### Requirements
@@ -160,6 +161,12 @@ Ex.
 ```
 > popcorn help dev
 ```
+
+#### [Back to contents](#contents)
+
+### Kernel Examples
+Some examples of how to construct a kernel can be seen at the following:
+- **[Tablespoon](https://github.com/punctuations/tablespoon)** created by [Matt](https://dont-ping.me)
 
 #### [Back to contents](#contents)
 
