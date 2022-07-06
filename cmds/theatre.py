@@ -264,6 +264,7 @@ def theatre(args):
         else:
             # from github.
             file_name = '@'.join(args[0].split('/'))
+            os_type = 'windows' if os.name == 'nt' else 'mac' if sys.platform == 'darwin' else 'linux'
             if not has_target_ver:
                 release = requests.get(f'https://api.github.com/repos/{args[0]}/tags').json()
                 ver = release[0]['name']
@@ -272,7 +273,7 @@ def theatre(args):
                 file_ext = '.zip'
                 try:
                     subprocess.run(f"Invoke-WebRequest https://github.com/{args[0]}/releases/download/{ver}/kernel"
-                                   f"{file_ext} -Out {TMP_DIR}{file_name}{file_ext}", shell=True, check=True)
+                                   f"-{os_type}{file_ext} -Out {TMP_DIR}{file_name}{file_ext}", shell=True, check=True)
                 except (OSError, subprocess.SubprocessError, subprocess.CalledProcessError) as e:
                     print(e)
                     styled_print.error("An error occurred while getting the theatre's kernel.")
@@ -282,7 +283,7 @@ def theatre(args):
                 file_ext = '.tar.gz'
                 try:
                     subprocess.run(f"curl --silent https://github.com/{args[0]}/releases/download/{ver}/kernel"
-                                   f"{file_ext} -L --output {TMP_DIR}{file_name}{file_ext}", shell=True, check=True)
+                                   f"-{os_type}{file_ext} -L --output {TMP_DIR}{file_name}{file_ext}", shell=True, check=True)
                 except (OSError, subprocess.SubprocessError, subprocess.CalledProcessError) as e:
                     print(e)
                     styled_print.error("An error occurred while getting the theatre's kernel.")
@@ -303,7 +304,6 @@ def theatre(args):
                 sys.exit(0)
 
             # check to see if it is compatible with current os
-            os_type = 'windows' if os.name == 'nt' else 'mac' if sys.platform == 'darwin' else 'linux'
             if os_type not in config["os"]:
                 styled_print.warning("Unsupported os type.")
                 shutil.rmtree(f"{TMP_DIR}{file_name}")
