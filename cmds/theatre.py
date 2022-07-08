@@ -283,7 +283,8 @@ def theatre(args):
                 file_ext = '.tar.gz'
                 try:
                     subprocess.run(f"curl --silent https://github.com/{args[0]}/releases/download/{ver}/kernel"
-                                   f"-{os_type}{file_ext} -L --output {TMP_DIR}{file_name}{file_ext}", shell=True, check=True)
+                                   f"-{os_type}{file_ext} -L --output {TMP_DIR}{file_name}{file_ext}", shell=True,
+                                   check=True)
                 except (OSError, subprocess.SubprocessError, subprocess.CalledProcessError) as e:
                     print(e)
                     styled_print.error("An error occurred while getting the theatre's kernel.")
