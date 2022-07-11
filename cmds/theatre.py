@@ -1,6 +1,5 @@
 import json
 import os
-import re
 import shutil
 import stat
 import subprocess
@@ -20,31 +19,6 @@ rcfile = f"{os.environ['HOME']}{os.sep}.{os.environ['SHELL'].split('/')[-1]}rc"
 dotprofile = f"{os.environ['HOME']}{os.sep}.profile"
 
 
-def install(config):
-    if os.path.exists(rcfile):
-        shellrc = open(rcfile, "r+")
-        if f". $HOME{os.sep}.kernels{os.sep}butter.sh\n" not in shellrc.readlines():
-            rclines = "\n".join(shellrc.readlines())
-            shellrc.write(f"\n. $HOME{os.sep}.kernels{os.sep}butter.sh\n{rclines}")
-            shellrc.close()
-            styled_print.success(f"Successfully added {config['kernel_name']}")
-        else:
-            styled_print.info("kernel already installed.")
-            shellrc.close()
-    else:
-        profile = open(dotprofile, "r+")
-        if f". $HOME{os.sep}.kernels{os.sep}butter.sh\n" not in profile.readlines():
-            proflines = "\n".join(profile.readlines())
-            profile.seek(0)
-            profile.write(f"\n. $HOME{os.sep}.kernels{os.sep}butter.sh\n{proflines}")
-            profile.truncate()
-            profile.close()
-            styled_print.success(f"Successfully added {config['kernel_name']}")
-        else:
-            styled_print.info("kernel already installed.")
-            profile.close()
-
-
 def build_thread(output, location, config):
     os.chdir(f'{TMP_DIR}{location}')
     kernel_type = config['kernel_type']
@@ -62,31 +36,14 @@ def build_thread(output, location, config):
         pass
 
     try:
-        # run seed_cmd
-        if kernel_type.lower() == "unpacked":
-            try:
-                os.mkdir(f"{PROD_DIR}{os.sep}{output}")
-            except FileExistsError:
-                pass
-            seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE) \
-                .sub(f"{PROD_DIR}{os.sep}{output}", config["seed_cmd"])
-        else:
-            seed_cmd = re.compile(re.escape("@dest"), re.IGNORECASE).sub(f"{PROD_DIR}", config["seed_cmd"])
-        exit_status = os.WEXITSTATUS(os.system(seed_cmd))
+        if kernel_type.lower() == 'unpacked':
+            kernel_files = [f for f in os.listdir()]
 
-        # create unpacked kernel with unpacked stem.
-        if kernel_type.lower() == "unpacked":
-            try:
-                arg_stem = re.compile(re.escape("@args"), re.IGNORECASE).sub("\"$@\"", config["unpacked_husk"])
-                unpacked_husk = re.compile(re.escape("@local"), re.IGNORECASE) \
-                    .sub(f"{PROD_DIR}{os.sep}{output[:-1] if output.endswith('/') else output}", arg_stem)
-                with open(f"{PROD_DIR}{os.sep}{output}{kernel_name}", "w") as kernel:
-                    kernel.write(f"#!/bin/bash\n{unpacked_husk}")
-                    kernel.close()
-            except KeyError:
-                styled_print.error("Please include the unpacked_husk in the config.")
-                kernel.close()
-                sys.exit(0)
+            for file in kernel_files:
+                shutil.move(file, f"{PROD_DIR}{os.sep}{output}{file}")
+        else:
+            # kernel is packed, only transfer the entry point.
+            os.rename(kernel_name, f"{PROD_DIR}{os.sep}{output}")
 
         # change permissions
         try:
@@ -96,8 +53,7 @@ def build_thread(output, location, config):
             styled_print.error("Unable to amend permission of file; file not found.")
             sys.exit(0)
 
-        if exit_status == 0:
-            styled_print.success("Compiled successfully!")
+        styled_print.success("Compiled successfully!")
 
     except KeyError:
         styled_print.error("Theatre does not contain a seed_cmd")
@@ -256,10 +212,7 @@ def theatre(args):
                 sys.exit(0)
 
             build(config, has_unpacked_flag, location=f"url-{hash_name}")
-            if os.name != 'nt':
-                install(config)
-            else:
-                styled_print.success(f"Successfully added {config['kernel_name']}")
+            styled_print.success(f"Successfully added {config['kernel_name']}")
 
         else:
             # from github.
@@ -320,10 +273,7 @@ def theatre(args):
                 sys.exit(0)
 
             build(config, has_unpacked_flag, location=f"{args[0]}")
-            if os.name != 'nt':
-                install(config)
-            else:
-                styled_print.success(f"Successfully added {config['kernel_name']}")
+            styled_print.success(f"Successfully added {config['kernel_name']}")
 
     else:
         styled_print.error("Please specify a Theatre.")
