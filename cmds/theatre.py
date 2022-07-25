@@ -6,6 +6,7 @@ import subprocess
 import sys
 import threading
 from zipfile import ZipFile
+import tarfile
 
 import requests
 
@@ -20,7 +21,7 @@ dotprofile = f"{os.environ['HOME']}{os.sep}.profile"
 
 
 def build_thread(output, location, config):
-    os.chdir(f'{TMP_DIR}{location}')
+    os.chdir(f'{location}')
     kernel_type = config['kernel_type']
     kernel_name = config['kernel_name']
     path_init = False
@@ -185,8 +186,12 @@ def theatre(args):
                 os.system(f"curl --silent {args[url_index + 1]} -L --output {TMP_DIR}url-{hash_name}{file_ext} "
                           f"--create-dirs")
 
-            with ZipFile(f'{TMP_DIR}url-{hash_name}{file_ext}', "r") as zip_obj:
-                zip_obj.extractall(f'{TMP_DIR}url-{hash_name}')
+            if os.name == 'nt':
+                with ZipFile(f'{TMP_DIR}url-{hash_name}{file_ext}', "r") as zip_obj:
+                    zip_obj.extractall(f'{TMP_DIR}url-{hash_name}')
+            else:
+                with tarfile.open(f'{TMP_DIR}url-{hash_name}{file_ext}', "r") as tar_obj:
+                    tar_obj.extractall(f'{TMP_DIR}url-{hash_name}')
 
             # load .kernelrc
             try:
@@ -244,8 +249,12 @@ def theatre(args):
                     styled_print.error("An error occurred while getting the theatre's kernel.")
                     sys.exit(0)
 
-            with ZipFile(f'{TMP_DIR}{file_name}{file_ext}', "r") as zip_obj:
-                zip_obj.extractall(f'{TMP_DIR}{file_name}')
+            if os.name == 'nt':
+                with ZipFile(f'{TMP_DIR}{file_name}{file_ext}', "r") as zip_obj:
+                    zip_obj.extractall(f'{TMP_DIR}{file_name}')
+            else:
+                with tarfile.open(f'{TMP_DIR}{file_name}{file_ext}', "r") as tar_obj:
+                    tar_obj.extractall(f'{TMP_DIR}{file_name}')
 
             # load .kernelrc
             try:
@@ -259,7 +268,7 @@ def theatre(args):
                 sys.exit(0)
 
             # check to see if it is compatible with current os
-            if os_type not in config["os"]:
+            if config["advanced"]["os"] and os_type not in config["advanced"]["os"]:
                 styled_print.warning("Unsupported os type.")
                 shutil.rmtree(f"{TMP_DIR}{file_name}")
                 shutil.rmtree(f"{TMP_DIR}{file_name}{file_ext}")
@@ -273,7 +282,7 @@ def theatre(args):
                 shutil.rmtree(f"{TMP_DIR}{file_name}{file_ext}")
                 sys.exit(0)
 
-            build(config, has_unpacked_flag, location=f"{args[0]}")
+            build(config, has_unpacked_flag, location=f"{TMP_DIR}{file_name}")
             styled_print.success(f"Successfully added {config['kernel_name']}")
 
     else:
