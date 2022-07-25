@@ -4,8 +4,8 @@ import shutil
 import stat
 import subprocess
 import sys
-import threading
 import tarfile
+import threading
 from zipfile import ZipFile
 
 import requests
