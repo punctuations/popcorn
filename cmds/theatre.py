@@ -5,8 +5,8 @@ import stat
 import subprocess
 import sys
 import threading
-from zipfile import ZipFile
 import tarfile
+from zipfile import ZipFile
 
 import requests
 
