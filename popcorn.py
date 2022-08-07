@@ -98,6 +98,12 @@ def popcorn(command):
 
         run_install = getattr(cmds["theatre"], "theatre")
         run_install(command[cmd_with_debug + 1:] if command[cmd_with_debug + 1:] != ['--debug'] else [])
+    elif command[cmd_with_debug] == 'uninstall':
+        # alias for theatre
+        styled_print.debug("running remove command") if has_debug_flag else None
+
+        run_install = getattr(cmds["remove"], "remove")
+        run_install(command[cmd_with_debug + 1:] if command[cmd_with_debug + 1:] != ['--debug'] else [])
     else:
         # if argument is passed in
         if len(command) >= 1:
