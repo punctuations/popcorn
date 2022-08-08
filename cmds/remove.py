@@ -55,7 +55,7 @@ def remove(args):
             else:
                 styled_print.error("kernel not installed.")
         else:
-            if f"{PROD_DIR}{os.sep}{args[0]}" in path:
+            if f"{PROD_DIR}{os.sep}{args[0]}" in path or os.path.exists(f"{PROD_DIR}{os.sep}{args[0]}"):
                 if os.name == 'nt':
                     split_paths = path.split(os.pathsep)
                     removed_kernel = f'{PROD_DIR}{os.sep}{args[0]}'
@@ -68,6 +68,9 @@ def remove(args):
                     except FileNotFoundError:
                         styled_print.error("kernel not found.")
                         sys.exit(0)
+                    except NotADirectoryError:
+                        os.remove(f"{PROD_DIR}{os.sep}{args[0]}")
+
                 else:
                     if args[0] == "butter.sh":
                         styled_print.error("Not a kernel.")
@@ -86,6 +89,8 @@ def remove(args):
                     except FileNotFoundError:
                         styled_print.error("kernel not found.")
                         sys.exit(0)
+                    except NotADirectoryError:
+                        os.remove(f"{PROD_DIR}{os.sep}{args[0]}")
 
                 styled_print.success(f"Removed {args[0]}")
                 styled_print.info("Please restart the terminal to apply changes.")
