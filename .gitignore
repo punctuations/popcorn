@@ -15,3 +15,7 @@ dist
 
 # my list
 **/TODO
+
+# Added by cargo
+
+/target
