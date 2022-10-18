@@ -21,11 +21,15 @@ name = "popcorn"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+log = "0.4.17"
 dirs = "4.0.0"
 state = "0.5.3"
+serde = "1.0.117"
 anyhow = "1.0.59"
 console = "0.15.1"
 webbrowser = "0.8.0"
+serde_json = "1.0.59"
+serde_derive = "1.0.117"
+tokio = { version = "1.20.1", features = ["full"] }
 clap = { version = "3.2.16", features = ["derive"] }
 async-compression = { version = "0.3.14", features = ["tokio", "gzip"] }
-tokio = { version = "1.20.1", features = ["full"] }

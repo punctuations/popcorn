@@ -1,6 +1,7 @@
 # editors
 .idea
 .vscode
+.fleet
 
 # python
 **/__pycache__
