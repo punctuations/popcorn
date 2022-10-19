@@ -1,13 +1,13 @@
 use anyhow::Result;
 use clap::Parser;
 
-use std::env;
-use std::fs::OpenOptions;
+use std::fs::{create_dir_all, read_to_string, OpenOptions};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
+use std::{env, path::Path};
 
-use crate::util::{clear, get_config, Config, Print, DEV_DIR, PROD_DIR};
+use crate::util::{get_config, Config, Print, DEV_DIR, PROD_DIR};
 
 #[derive(Debug, Parser)]
 pub struct Options {
@@ -70,15 +70,10 @@ fn apply_changes() -> Result<(), String> {
     }
 }
 
-fn install_dev() -> Result<(), String> {
+fn install_dev(PATH: String) -> Result<(), String> {
     if DEV_DIR() == "" {
         return Err("An error occurred while loading the DEV_DIR".to_string());
     }
-
-    let PATH: String = match env::var("PATH") {
-        Ok(path) => path,
-        Err(_) => "".to_string(),
-    };
 
     if !PATH.contains(&DEV_DIR()) {
         if cfg!(target_os = "windows") {
@@ -155,6 +150,113 @@ fn install_dev() -> Result<(), String> {
     }
 }
 
+fn install_prod(PATH: String, butter_file: PathBuf) -> Result<(), String> {
+    if PROD_DIR() == "" {
+        Print::error("An error occurred while loading the PROD_DIR");
+        return Ok(());
+    }
+
+    if cfg!(target_os = "windows") {
+        // add system-wide
+        match Command::new("[Environment]::SetEnvironmentVariable('PATH',")
+            .args([
+                format!("$env:PATH{},", butter_file.display()),
+                "'User')".to_string(),
+            ])
+            .output()
+        {
+            Ok(_) => (),
+            Err(e) => return Err(e.to_string()),
+        }
+        // add for current terminal session
+        Command::new("$env:PATH")
+            .args(["+=", format!("'{}'", butter_file.display()).as_str()])
+            .output()
+            .unwrap();
+
+        match apply_changes() {
+            Ok(_) => return Ok(()),
+            Err(err) => {
+                Print::error(err.as_str());
+                return Ok(());
+            }
+        }
+    } else {
+        // edit .shellrc or .profile
+        let shell: String = match env::var("SHELL") {
+            Ok(path) => path,
+            Err(_) => "".to_string(),
+        };
+
+        let home: PathBuf = match dirs::home_dir() {
+            Some(path) => path,
+            None => return Err("Cannot find home_dir".to_string()),
+        };
+
+        let rc_path = home.join(format!(".{}rc", shell.split("/").last().unwrap()));
+        let rc_filepath = rc_path.clone();
+        let profile_path = home.join(".profile");
+        let profile_filepath = profile_path.clone();
+
+        if rc_path.exists() {
+            let contents = read_to_string(rc_path).expect("Unable to read rc file [prod:500]");
+            if !contents.contains(". $HOME/.kernels/butter.sh") {
+                // open file in truncate
+                let mut file = match OpenOptions::new()
+                    .write(true)
+                    .truncate(true)
+                    .open(rc_filepath)
+                {
+                    Ok(file) => file,
+                    Err(_e) => return Err("rc_path not found".to_string()),
+                };
+
+                file.write(format!(". $HOME/.kernels/butter.sh\n{}", contents).as_bytes())
+                    .unwrap();
+
+                match apply_changes() {
+                    Ok(_) => return Ok(()),
+                    Err(err) => {
+                        Print::error(err.as_str());
+                        return Ok(());
+                    }
+                }
+            } else {
+                Print::info("Kernel already installed");
+                return Ok(());
+            }
+        } else {
+            let contents =
+                read_to_string(profile_path).expect("Unable to read profile file [prod:500]");
+            if !contents.contains(". $HOME/.kernels/butter.sh") {
+                // open file in truncate
+                let mut file = match OpenOptions::new()
+                    .write(true)
+                    .truncate(true)
+                    .open(profile_filepath)
+                {
+                    Ok(file) => file,
+                    Err(_e) => return Err("profile path not found".to_string()),
+                };
+
+                file.write(format!(". $HOME/.kernels/butter.sh\n{}", contents).as_bytes())
+                    .unwrap();
+
+                match apply_changes() {
+                    Ok(_) => return Ok(()),
+                    Err(err) => {
+                        Print::error(err.as_str());
+                        return Ok(());
+                    }
+                }
+            } else {
+                Print::info("Kernel already installed!");
+                return Ok(());
+            }
+        }
+    }
+}
+
 pub async fn handle(options: Options) -> Result<()> {
     let CONFIG: Config;
 
@@ -170,8 +272,33 @@ pub async fn handle(options: Options) -> Result<()> {
         return Ok(());
     }
 
+    let PATH: String = match env::var("PATH") {
+        Ok(path) => path,
+        Err(_) => "".to_string(),
+    };
+
+    // CREATE BUTTER.SH FILE IF DOESNT EXIST
+    let dir = &PROD_DIR();
+    let prod_directory = Path::new(dir);
+    let butter_file = prod_directory.join("butter.sh");
+
+    let butter_filepath = butter_file.clone();
+
+    if !butter_file.exists() {
+        if !prod_directory.exists() {
+            create_dir_all(PROD_DIR())?;
+        }
+
+        let mut butter = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .open(butter_file)?;
+
+        write!(butter, "#!/bin/bash\n").unwrap();
+    }
+
     if options.dev {
-        match install_dev() {
+        match install_dev(PATH) {
             Ok(_) => (),
             Err(err) => {
                 Print::error(err.as_str());
@@ -179,12 +306,13 @@ pub async fn handle(options: Options) -> Result<()> {
             }
         }
     } else {
-        if PROD_DIR() == "" {
-            Print::error("An error occurred while loading the PROD_DIR");
-            return Ok(());
+        match install_prod(PATH, butter_filepath) {
+            Ok(_) => (),
+            Err(err) => {
+                Print::error(err.as_str());
+                return Ok(());
+            }
         }
-        // ...
-        println!("install_prod")
     }
 
     Ok(())

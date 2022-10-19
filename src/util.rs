@@ -60,7 +60,7 @@ pub fn PROD_DIR() -> String {
     match dirs::home_dir() {
         Some(path) => {
             return path
-                .join(".popcorn")
+                .join(".kernels")
                 .into_os_string()
                 .into_string()
                 .unwrap()
