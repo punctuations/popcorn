@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::{env, path::Path};
 
-use crate::util::{get_config, Config, Print, DEV_DIR, PROD_DIR};
+use crate::util::{get_config, Config, Print, DEV_DIR, PATHSEP, PROD_DIR};
 
 #[derive(Debug, Parser)]
 pub struct Options {
@@ -15,7 +15,7 @@ pub struct Options {
     dev: bool,
 }
 
-fn apply_changes() -> Result<(), String> {
+pub fn apply_changes() -> Result<(), String> {
     if cfg!(target_os = "windows") {
         match Command::new(".").arg("$profile").output() {
             Ok(_) => {
@@ -79,14 +79,17 @@ fn install_dev(PATH: String) -> Result<(), String> {
         if cfg!(target_os = "windows") {
             // add to the path
             match Command::new("[Environment]::SetEnvironmentVariable('PATH',")
-                .args([format!("$env:PATH{},", DEV_DIR()), "'User')".to_string()])
+                .args([
+                    format!("$env:PATH{}{},", PATHSEP, DEV_DIR()),
+                    "'User')".to_string(),
+                ])
                 .output()
             {
                 Ok(_) => (),
                 Err(e) => return Err(e.to_string()),
             }
             Command::new("$env:PATH")
-                .args(["+=", format!("'{}'", DEV_DIR()).as_str()])
+                .args(["+=", format!("'{}{}'", PATHSEP, DEV_DIR()).as_str()])
                 .output()
                 .unwrap();
 
@@ -160,7 +163,7 @@ fn install_prod(PATH: String, butter_file: PathBuf) -> Result<(), String> {
         // add system-wide
         match Command::new("[Environment]::SetEnvironmentVariable('PATH',")
             .args([
-                format!("$env:PATH{},", butter_file.display()),
+                format!("$env:PATH{}{},", PATHSEP, butter_file.display()),
                 "'User')".to_string(),
             ])
             .output()
@@ -170,7 +173,10 @@ fn install_prod(PATH: String, butter_file: PathBuf) -> Result<(), String> {
         }
         // add for current terminal session
         Command::new("$env:PATH")
-            .args(["+=", format!("'{}'", butter_file.display()).as_str()])
+            .args([
+                "+=",
+                format!("'{}{}'", PATHSEP, butter_file.display()).as_str(),
+            ])
             .output()
             .unwrap();
 

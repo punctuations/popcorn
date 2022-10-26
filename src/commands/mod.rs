@@ -1,6 +1,7 @@
-pub mod issue;
+pub mod build;
 pub mod init;
 pub mod install;
+pub mod issue;
 use anyhow::Result;
 
 use clap::Subcommand;
@@ -12,6 +13,7 @@ pub enum Commands {
     Issue(issue::Options),
     Init(init::Options),
     Install(install::Options),
+    Build(build::Options),
 }
 
 pub async fn handle_command(command: Commands) -> Result<()> {
@@ -19,5 +21,6 @@ pub async fn handle_command(command: Commands) -> Result<()> {
         Commands::Issue(options) => issue::handle(options).await,
         Commands::Init(options) => init::handle(options).await,
         Commands::Install(options) => install::handle(options).await,
+        Commands::Build(options) => build::handle(options).await,
     }
 }

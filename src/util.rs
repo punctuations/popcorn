@@ -9,21 +9,26 @@ use std::any::{type_name, Any};
 use std::path::MAIN_SEPARATOR;
 
 pub const SEP: char = MAIN_SEPARATOR;
+pub const PATHSEP: char = if cfg!(target_os = "windows") {
+    ';'
+} else {
+    ':'
+};
 
 #[derive(Debug, Deserialize, Default)]
 pub struct AdvancedConfig {
-    pub os: [String; 3],
-    pub dev_node: String,
+    pub os: Option<[String; 3]>,
+    pub dev_node: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Default)]
 pub struct Config {
     pub kernel_name: String,
     pub kernel_type: String,
-    pub unpacked_husk: String,
+    pub unpacked_husk: Option<String>,
     pub dev_cmd: String,
     pub seed_cmd: String,
-    pub advanced: AdvancedConfig,
+    pub advanced: Option<AdvancedConfig>,
 }
 
 pub fn get_config() -> Result<Config, String> {
@@ -37,8 +42,17 @@ pub fn get_config() -> Result<Config, String> {
         }
     }
 
-    // OK to panic here
-    let config: Config = serde_json::from_str(&file).unwrap();
+    let config: Config = match serde_json::from_str(&file) {
+        Ok(json) => json,
+        Err(_) => Config {
+            kernel_name: "".to_string(),
+            kernel_type: "".to_string(),
+            unpacked_husk: Some("".to_string()),
+            dev_cmd: "".to_string(),
+            seed_cmd: "".to_string(),
+            advanced: None,
+        },
+    };
 
     Ok(config)
 }
