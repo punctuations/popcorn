@@ -10,8 +10,9 @@ use std::{env, path::Path};
 use crate::util::{get_config, Config, Print, DEV_DIR, PATHSEP, PROD_DIR};
 
 #[derive(Debug, Parser)]
+#[clap(about = "Install a kernel into PATH.")]
 pub struct Options {
-    #[clap(long = "dev", help = "Install development kernels.")]
+    #[clap(short = 'd', long = "dev", help = "Install development kernels.")]
     dev: bool,
 }
 
@@ -122,8 +123,10 @@ fn install_dev(PATH: String) -> Result<(), String> {
                     Err(_e) => return Err(".profile not found".to_string()),
                 };
 
-                file.write(format!("\nexport PATH=$PATH{}\n", DEV_DIR()).as_bytes())
-                    .unwrap();
+                file.write(
+                    format!("\nexport PATH=$PATH{SEP}{}\n", DEV_DIR(), SEP = PATHSEP).as_bytes(),
+                )
+                .unwrap();
             } else {
                 // edit .profile
                 let mut file = match OpenOptions::new()
@@ -135,8 +138,10 @@ fn install_dev(PATH: String) -> Result<(), String> {
                     Err(_e) => return Err(".profile not found".to_string()),
                 };
 
-                file.write(format!("\nexport PATH=$PATH{}\n", DEV_DIR()).as_bytes())
-                    .unwrap();
+                file.write(
+                    format!("\nexport PATH=$PATH{SEP}{}\n", DEV_DIR(), SEP = PATHSEP).as_bytes(),
+                )
+                .unwrap();
             }
 
             match apply_changes() {

@@ -9,6 +9,7 @@ use std::path::Path;
 use crate::util::{Print, SEP};
 
 #[derive(Debug, Parser)]
+#[clap(about = "Initialize configuration file.")]
 pub struct Options {
     #[clap(short = 'f', long = "force", help = "Overwrite existing config file.")]
     force: bool,
