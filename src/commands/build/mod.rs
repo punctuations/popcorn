@@ -25,20 +25,30 @@ pub struct Options {
     output: Option<String>,
 }
 
-fn seed_cmd(config_seed: String, kernel_type: String, output: PathBuf) -> Result<(), &'static str> {
+pub fn seed_cmd(
+    config_seed: String,
+    kernel_type: String,
+    output: PathBuf,
+    is_dev: bool,
+) -> Result<(), &'static str> {
     let seed_cmd: String;
+
+    let dest = if is_dev { DEV_DIR() } else { PROD_DIR() };
 
     // initiliaze seed_cmd
     if kernel_type == "unpacked" {
         // make unpacked output dir and run seed cmd
-        create_dir_all(output.clone());
+        if !is_dev {
+            create_dir_all(output.clone());
+        }
+
         seed_cmd = config_seed.to_lowercase().replace(
             "@dest",
             &output.clone().into_os_string().into_string().unwrap(),
         );
     } else {
         // put into prod_dir (is only one file & output is callable name)
-        seed_cmd = config_seed.to_lowercase().replace("@dest", &PROD_DIR());
+        seed_cmd = config_seed.to_lowercase().replace("@dest", &dest);
     }
 
     // run new seed cmd
@@ -236,6 +246,7 @@ pub fn build_thread(output: String, config: Config) -> Result<(), ()> {
         config.seed_cmd.clone(),
         config.kernel_type.clone(),
         output_dir,
+        false,
     ) {
         Ok(_) => (),
         Err(err) => {

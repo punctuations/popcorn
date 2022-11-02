@@ -1,4 +1,5 @@
 use anyhow::Result;
+use chrono::Local;
 use console::style;
 use dirs;
 use std::env;
@@ -8,6 +9,8 @@ use serde_derive::Deserialize;
 use std::any::{type_name, Any};
 use std::path::MAIN_SEPARATOR;
 
+pub mod blame;
+
 pub const SEP: char = MAIN_SEPARATOR;
 pub const PATHSEP: char = if cfg!(target_os = "windows") {
     ';'
@@ -15,13 +18,13 @@ pub const PATHSEP: char = if cfg!(target_os = "windows") {
     ':'
 };
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Default, Clone)]
 pub struct AdvancedConfig {
     pub os: Option<[String; 3]>,
     pub dev_node: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Default, Clone)]
 pub struct Config {
     pub kernel_name: String,
     pub kernel_type: String,
@@ -106,6 +109,10 @@ impl Print {
         println!("{}: {}", style(notation).color256(color), message);
     }
 
+    pub fn bold(message: &str) -> () {
+        println!("{}", style(message).bold());
+    }
+
     pub fn error(message: &str) -> () {
         Self::print_color("[ERROR]", message, 1)
     }
@@ -123,6 +130,10 @@ impl Print {
     }
 
     pub fn event(message: &str) -> () {
-        Self::print_color("[INFO]", message, 57)
+        Self::print_color(
+            &format!("[EVENT @ {}]", Local::now().format("%H:%M:%S")),
+            message,
+            13,
+        )
     }
 }
