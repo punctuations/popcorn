@@ -7,7 +7,7 @@ pub struct Blame<'a> {
 
 pub const BLAME: Blame = Blame {
     name: "🍿  Popcorn",
-    description: "Say good-bye to complicated installation instructions.",
-    version: "1.0.8",
-    source: "https://github.com/punctuations/popcorn",
+    description: env!("CARGO_PKG_DESCRIPTION"),
+    version: env!("CARGO_PKG_VERSION"),
+    source: env!("CARGO_PKG_REPOSITORY"),
 };
