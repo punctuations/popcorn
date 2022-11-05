@@ -39,7 +39,7 @@ fn dev_compile(config: Config) -> Result<(), ()> {
         Path::new(&DEV_DIR()).to_path_buf(),
         true,
     ) {
-        Ok(_) => (),
+        Ok(()) => (),
         Err(err) => {
             Print::error(err);
             return Err(());
@@ -60,7 +60,7 @@ fn dev_compile(config: Config) -> Result<(), ()> {
             "{dir}{sep}{husk_name}",
             dir = &DEV_DIR(),
             sep = &SEP,
-            husk_name = config.kernel_name.clone()
+            husk_name = config.kernel_name.clone(),
         )) {
             Ok(file) => file,
             Err(err) => {
@@ -70,7 +70,7 @@ fn dev_compile(config: Config) -> Result<(), ()> {
         };
 
         match husk.write_all(format!("#!/bin/bash\n{}", stem_cmd).as_bytes()) {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(_err) => {
                 Print::error("An error occured while writing to husk file.");
                 return Err(());
@@ -78,12 +78,42 @@ fn dev_compile(config: Config) -> Result<(), ()> {
         }
     }
 
+    let dev_node = if config.advanced.is_some() && config.advanced.clone().unwrap().os.is_some() {
+        config.advanced.unwrap().dev_node.unwrap()
+    } else {
+        "-dev".to_string()
+    };
+
+    // rename husk_file to husk_file-<dev_node>
+    match fs::rename(
+        format!(
+            "{dir}{sep}{husk_name}",
+            dir = &DEV_DIR(),
+            sep = &SEP,
+            husk_name = config.kernel_name.clone()
+        ),
+        format!(
+            "{dir}{sep}{husk_name}{dev_node}",
+            dir = &DEV_DIR(),
+            sep = &SEP,
+            husk_name = config.kernel_name.clone(),
+            dev_node = dev_node
+        ),
+    ) {
+        Ok(()) => (),
+        Err(_) => {
+            Print::error("Unable to create dev_node");
+            return Err(());
+        }
+    }
+
     // change permissions of file to be accessible by all
     let mut perms = fs::metadata(format!(
-        "{dir}{sep}{husk_name}",
+        "{dir}{sep}{husk_name}{dev_node}",
         dir = &DEV_DIR(),
         sep = &SEP,
-        husk_name = config.kernel_name.clone()
+        husk_name = config.kernel_name.clone(),
+        dev_node = dev_node
     ))
     .unwrap()
     .permissions();
@@ -102,8 +132,8 @@ fn thread_compile(config: Config) -> () {
 
     // compile logic -> bool success state
     let completed = match dev_compile(config) {
-        Ok(_) => true,
-        Err(_) => false,
+        Ok(()) => true,
+        Err(()) => false,
     };
 
     // format ending time
