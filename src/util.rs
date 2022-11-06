@@ -2,14 +2,38 @@ use anyhow::Result;
 use chrono::Local;
 use console::style;
 use dirs;
+use std::collections::hash_map::DefaultHasher;
 use std::env;
+use std::hash::{Hash, Hasher};
 
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 
 use std::any::{type_name, Any};
-use std::path::MAIN_SEPARATOR;
+use std::path::{Path, MAIN_SEPARATOR};
 
 pub mod blame;
+
+pub type GithubTags = Vec<Root>;
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Root {
+    pub name: String,
+    #[serde(rename = "zipball_url")]
+    pub zipball_url: String,
+    #[serde(rename = "tarball_url")]
+    pub tarball_url: String,
+    pub commit: Commit,
+    #[serde(rename = "node_id")]
+    pub node_id: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Commit {
+    pub sha: String,
+    pub url: String,
+}
 
 pub const SEP: char = MAIN_SEPARATOR;
 pub const PATHSEP: char = if cfg!(target_os = "windows") {
@@ -60,6 +84,47 @@ pub fn get_config() -> Result<Config, String> {
     Ok(config)
 }
 
+pub fn open_config(path: &str) -> Result<Config, String> {
+    let file: String;
+
+    match read_file(path) {
+        Ok(contents) => file = contents,
+        Err(error) => {
+            return Err(error);
+        }
+    }
+
+    let config: Config = match serde_json::from_str(&file) {
+        Ok(json) => json,
+        Err(_) => Config {
+            kernel_name: "".to_string(),
+            kernel_type: "".to_string(),
+            unpacked_husk: Some("".to_string()),
+            dev_cmd: "".to_string(),
+            seed_cmd: "".to_string(),
+            advanced: None,
+        },
+    };
+
+    Ok(config)
+}
+
+pub fn TMP() -> String {
+    if cfg!(target_os = "windows") {
+        return env::temp_dir()
+            .join("popcorn-kernel")
+            .into_os_string()
+            .into_string()
+            .unwrap();
+    } else {
+        return Path::new("/tmp")
+            .join("popcorn-kernel")
+            .into_os_string()
+            .into_string()
+            .unwrap();
+    };
+}
+
 pub fn DEV_DIR() -> String {
     match env::current_dir() {
         Ok(path) => {
@@ -100,6 +165,12 @@ pub fn read_file(file_name: &str) -> Result<String, String> {
         Ok(contents) => Ok(contents),
         Err(error) => Err(error.to_string()),
     }
+}
+
+pub fn calculate_hash<T: Hash>(t: &T) -> u64 {
+    let mut s = DefaultHasher::new();
+    t.hash(&mut s);
+    s.finish()
 }
 
 pub struct Print;

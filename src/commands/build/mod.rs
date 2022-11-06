@@ -59,7 +59,7 @@ pub fn seed_cmd(
 
     if let Ok(mut child) = Command::new(shell.split("/").last().unwrap())
         .arg("-c")
-        .arg(seed_cmd)
+        .arg(seed_cmd.clone())
         .spawn()
     {
         let finished = child.wait().unwrap();
@@ -102,7 +102,7 @@ fn ensure_butter_in_path() -> Result<(), String> {
                 .unwrap();
 
             match apply_changes() {
-                Ok(_) => return Ok(()),
+                Ok(()) => return Ok(()),
                 Err(err) => {
                     return Err(err);
                 }
@@ -127,7 +127,7 @@ fn ensure_butter_in_path() -> Result<(), String> {
                 .unwrap();
 
             match apply_changes() {
-                Ok(_) => return Ok(()),
+                Ok(()) => return Ok(()),
                 Err(err) => {
                     return Err(err);
                 }
@@ -169,7 +169,7 @@ fn update_path(kernel_type: String, output: String) -> Result<(), String> {
                 .unwrap();
 
             match apply_changes() {
-                Ok(_) => return Ok(()),
+                Ok(()) => return Ok(()),
                 Err(err) => {
                     return Err(err);
                 }
@@ -213,7 +213,7 @@ fn update_path(kernel_type: String, output: String) -> Result<(), String> {
             }
 
             match ensure_butter_in_path() {
-                Ok(_) => return Ok(()),
+                Ok(()) => return Ok(()),
                 Err(err) => return Err(err),
             }
         }
@@ -222,7 +222,12 @@ fn update_path(kernel_type: String, output: String) -> Result<(), String> {
     Ok(())
 }
 
-pub fn build_thread(output: String, config: Config) -> Result<(), ()> {
+pub fn build_thread(
+    output: String,
+    config: Config,
+    external: bool,
+    external_dir: String,
+) -> Result<(), ()> {
     let output_path = Path::new(&PROD_DIR()).join(output.clone());
     let output_dir = if config.kernel_type.to_lowercase() == "unpacked" {
         output_path.clone()
@@ -234,24 +239,75 @@ pub fn build_thread(output: String, config: Config) -> Result<(), ()> {
     if config.kernel_type.to_lowercase() == "unpacked" && output_path.exists() {
         // prod dir already exists, only need to remove possible unpacked conflict.
         match remove_dir_all(output_path) {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(_err) => {
                 Print::error("Unable to remove existing kernel.");
                 return Err(());
             }
         }
     }
+    if external {
+        // move files from /tmp/ to prod_dir
+        if config.kernel_type.to_lowercase() == "unpacked" {
+            let dir_contents = fs::read_dir(external_dir).unwrap();
 
-    match seed_cmd(
-        config.seed_cmd.clone(),
-        config.kernel_type.clone(),
-        output_dir,
-        false,
-    ) {
-        Ok(_) => (),
-        Err(err) => {
-            Print::error(err);
-            return Err(());
+            for contents in dir_contents {
+                let file = contents.unwrap();
+
+                create_dir_all(output_dir.clone().as_os_str());
+
+                match fs::rename(
+                    file.path(),
+                    format!(
+                        "{}{SEP}{}",
+                        output_dir.clone().display(),
+                        file.file_name().into_string().unwrap(),
+                        SEP = SEP
+                    ),
+                ) {
+                    Ok(()) => (),
+                    Err(_) => {
+                        Print::error("Unable to move files.");
+                        remove_dir_all(output_dir);
+                        return Err(());
+                    }
+                }
+            }
+        } else {
+            match fs::rename(
+                format!(
+                    "{}{SEP}{}",
+                    external_dir,
+                    config.kernel_name.clone(),
+                    SEP = SEP
+                ),
+                format!(
+                    "{}{SEP}{}",
+                    output_dir.clone().display(),
+                    config.kernel_name.clone(),
+                    SEP = SEP
+                ),
+            ) {
+                Ok(()) => (),
+                Err(_) => {
+                    Print::error("Unable to move entry file.");
+                    remove_dir_all(output_dir);
+                    return Err(());
+                }
+            }
+        }
+    } else {
+        match seed_cmd(
+            config.seed_cmd.clone(),
+            config.kernel_type.clone(),
+            output_dir.clone(),
+            false,
+        ) {
+            Ok(()) => (),
+            Err(err) => {
+                Print::error(err);
+                return Err(());
+            }
         }
     }
 
@@ -287,7 +343,7 @@ pub fn build_thread(output: String, config: Config) -> Result<(), ()> {
         };
 
         match husk.write_all(format!("#!/bin/bash\n{}", stem_cmd).as_bytes()) {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(_err) => {
                 Print::error("An error occured while writing to husk file.");
                 return Err(());
@@ -296,11 +352,11 @@ pub fn build_thread(output: String, config: Config) -> Result<(), ()> {
     }
 
     // change permissions of file to be accessible by all
+
     let mut perms = fs::metadata(format!(
-        "{dir}{sep}{output}{husk_name}",
-        dir = &PROD_DIR(),
-        sep = &SEP,
-        output = output,
+        "{output_dir}{SEP}{husk_name}",
+        output_dir = output_dir.display(),
+        SEP = SEP,
         husk_name = config.kernel_name.clone()
     ))
     .unwrap()
@@ -315,7 +371,7 @@ pub fn build_thread(output: String, config: Config) -> Result<(), ()> {
     Print::info("Compiled successfully.");
 
     match update_path(config.kernel_type.clone(), output.clone()) {
-        Ok(_) => {
+        Ok(()) => {
             Print::success(format!("Successfully built {}", config.kernel_name).as_str());
             return Ok(());
         }
@@ -365,7 +421,7 @@ pub async fn handle(options: Options) -> Result<()> {
         output = output + &SEP.to_string();
     }
 
-    thread::spawn(|| build_thread(output, CONFIG)).join();
+    thread::spawn(|| build_thread(output, CONFIG, false, String::new())).join();
 
     Ok(())
 }

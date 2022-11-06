@@ -95,7 +95,7 @@ fn install_dev(PATH: String) -> Result<(), String> {
                 .unwrap();
 
             match apply_changes() {
-                Ok(_) => return Ok(()),
+                Ok(()) => return Ok(()),
                 Err(err) => {
                     Print::error(err.as_str());
                     return Ok(());
@@ -145,7 +145,7 @@ fn install_dev(PATH: String) -> Result<(), String> {
             }
 
             match apply_changes() {
-                Ok(_) => return Ok(()),
+                Ok(()) => return Ok(()),
                 Err(err) => {
                     Print::error(err.as_str());
                     return Ok(());
@@ -186,7 +186,7 @@ fn install_prod(PATH: String, butter_file: PathBuf) -> Result<(), String> {
             .unwrap();
 
         match apply_changes() {
-            Ok(_) => return Ok(()),
+            Ok(()) => return Ok(()),
             Err(err) => {
                 Print::error(err.as_str());
                 return Ok(());
@@ -226,7 +226,7 @@ fn install_prod(PATH: String, butter_file: PathBuf) -> Result<(), String> {
                     .unwrap();
 
                 match apply_changes() {
-                    Ok(_) => return Ok(()),
+                    Ok(()) => return Ok(()),
                     Err(err) => {
                         Print::error(err.as_str());
                         return Ok(());
@@ -254,7 +254,7 @@ fn install_prod(PATH: String, butter_file: PathBuf) -> Result<(), String> {
                     .unwrap();
 
                 match apply_changes() {
-                    Ok(_) => return Ok(()),
+                    Ok(()) => return Ok(()),
                     Err(err) => {
                         Print::error(err.as_str());
                         return Ok(());
@@ -310,7 +310,7 @@ pub async fn handle(options: Options) -> Result<()> {
 
     if options.dev {
         match install_dev(PATH) {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(err) => {
                 Print::error(err.as_str());
                 return Ok(());
@@ -318,7 +318,7 @@ pub async fn handle(options: Options) -> Result<()> {
         }
     } else {
         match install_prod(PATH, butter_filepath) {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(err) => {
                 Print::error(err.as_str());
                 return Ok(());

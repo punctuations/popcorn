@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 
 use std::fmt::format;
-use std::fs::{create_dir_all, read_to_string, OpenOptions};
+use std::fs::{create_dir_all, read_to_string, remove_dir_all, remove_file, OpenOptions};
 use std::io::{prelude::*, BufReader};
 use std::path::PathBuf;
 use std::process::Command;
@@ -147,7 +147,14 @@ fn remove_prod(kernel_name: String, PATH: String) -> Result<String, String> {
         kernel_name,
         SEP = SEP,
         PROD = PROD_DIR()
-    )) {
+    )) || Path::new(&format!(
+        "{PROD}{SEP}{}",
+        kernel_name,
+        SEP = SEP,
+        PROD = PROD_DIR()
+    ))
+    .exists()
+    {
         if cfg!(target_os = "windows") {
             return match remove_windows(
                 format!("{PROD}{SEP}{}", kernel_name, SEP = SEP, PROD = PROD_DIR()),
@@ -191,6 +198,15 @@ fn remove_prod(kernel_name: String, PATH: String) -> Result<String, String> {
 
             // write to file
             write!(butter, "{}", contents_str);
+
+            // remove it
+            match remove_file(removed_kernel.clone()) {
+                Ok(()) => (),
+                Err(_) => match remove_dir_all(removed_kernel) {
+                    Ok(()) => (),
+                    Err(_) => (),
+                },
+            }
 
             Ok(format!("Removed kernel {}!", kernel_name))
         }
