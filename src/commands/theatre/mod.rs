@@ -153,7 +153,7 @@ fn download_kernel(url: String, file_name: String) -> Result<String, String> {
         };
 
         // untaring will save it to incorrect dir, need to move contents of dir outside of it.
-        let mut files =
+        let files =
             read_dir(format!("{}{sep}{}-download", TMP(), file_name, sep = SEP)).unwrap();
 
         // ensure the final dir is empty/non-existant so no errors are thrown during rename
