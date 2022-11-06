@@ -1,8 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 
-use std::fmt::format;
-use std::fs::{create_dir_all, read_to_string, remove_dir_all, remove_file, OpenOptions};
+use std::fs::{remove_dir_all, remove_file, OpenOptions};
 use std::io::{prelude::*, BufReader};
 use std::path::PathBuf;
 use std::process::Command;
@@ -95,7 +94,7 @@ fn remove_dev(kernel_name: String, PATH: String) -> Result<String, String> {
                     Err(_) => return Err("Unable to open rc file".to_string()),
                 };
 
-                let mut reader = BufReader::new(file.try_clone().unwrap());
+                let reader = BufReader::new(file.try_clone().unwrap());
 
                 // filter array
                 let filter: Vec<_> = reader

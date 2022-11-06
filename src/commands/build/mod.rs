@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 
-use std::env::{self, current_dir};
+use std::env;
 use std::fs::{self, File, OpenOptions};
 use std::io::{prelude::*, BufReader};
 use std::os::unix::prelude::PermissionsExt;
@@ -10,7 +10,7 @@ use std::process::Command;
 use std::thread;
 use std::{fs::create_dir_all, fs::remove_dir_all, path::Path};
 
-use crate::util::{get_config, AdvancedConfig, Config, Print, DEV_DIR, PATHSEP, PROD_DIR, SEP};
+use crate::util::{get_config, Config, Print, DEV_DIR, PATHSEP, PROD_DIR, SEP};
 
 use super::install::apply_changes;
 
