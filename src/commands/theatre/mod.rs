@@ -169,7 +169,7 @@ fn download_kernel(url: String, file_name: String) -> Result<String, String> {
                 dir.path(),
                 format!("{}{sep}{}", TMP(), file_name, sep = SEP),
             ) {
-                Ok(_) => {
+                Ok(()) => {
                     remove_dir_all(format!("{}{sep}{}-download", TMP(), file_name, sep = SEP));
                     inc_progress_bar()
                 }
@@ -184,11 +184,10 @@ fn download_kernel(url: String, file_name: String) -> Result<String, String> {
                 format!("{}{sep}{}-download", TMP(), file_name, sep = SEP),
                 format!("{}{sep}{}", TMP(), file_name, sep = SEP),
             ) {
-                Ok(_) => inc_progress_bar(),
-                Err(_err) => {
+                Ok(()) => inc_progress_bar(),
+                Err(_) => {
                     print_progress_bar_info("Failed", "to format dir", Color::Red, Style::Normal);
                     finalize_progress_bar();
-                    println!("{}", _err);
                     return Err("Unable to rename dir".to_string());
                 }
             }
@@ -229,6 +228,18 @@ fn ensure_os_compat(path: String) -> Result<Config, String> {
     }
 
     Ok(config)
+}
+
+fn download_homebrew(pkg: &str) -> Result<(), String> {
+    println!("Homebrew download {}", pkg);
+
+    Ok(())
+}
+
+fn download_yum(pkg: &str) -> Result<(), String> {
+    println!("yum download {}", pkg);
+
+    Ok(())
 }
 
 pub async fn handle(options: Options) -> Result<()> {
@@ -337,6 +348,20 @@ pub async fn handle(options: Options) -> Result<()> {
         } else {
             "linux.tar.gz".to_string()
         };
+
+        // used to detect if is other pkg manager
+        let kernel_name_split = kernel_link.split("/").collect::<Vec<&str>>();
+        let repo = kernel_name_split[0];
+        let pkg = kernel_name_split[1];
+
+        // allow compatibility!
+        if repo.to_lowercase() == "homebrew" || repo.to_lowercase() == "brew" {
+            download_homebrew(pkg);
+            return Ok(());
+        } else if repo.to_lowercase() == "yum" {
+            download_yum(pkg);
+            return Ok(());
+        }
 
         // get ver number
         if ver.is_none() {
