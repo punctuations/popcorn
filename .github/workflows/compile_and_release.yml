@@ -80,7 +80,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: x86_64-apple-darwin # will probably have to change this around to accomodate for M1 & M2
+          target: [x86_64-apple-darwin, aarch64-apple-darwin] # will probably have to change this around to accomodate for M1 & M2
         
         uses: actions-rs/cargo@v1
         with:
