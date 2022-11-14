@@ -8,10 +8,14 @@ jobs:
       - name: checkout source repo
         uses: actions/checkout@v2
 
-      - name: linting
+      - name: setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
           components: rustfmt, clippy
-        run: cargo clean
+
+      - name: Run cargo clean
+        uses: actions-rs/cargo@v1
+        with:
+          command: clean
