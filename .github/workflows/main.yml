@@ -14,4 +14,4 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt, clippy
-          command: clean
+        run: cargo clean
