@@ -69,21 +69,34 @@ jobs:
         with:
           toolchain: stable
           target: x86_64-unknown-linux-gnu
-        run: cargo build --release --target $TARGET
+
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{with.target}}
+        
         
         if: startsWith(matrix.config.os, 'macos') 
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: x86_64-apple-darwin # will probably have to change this around to accomodate for M1 & M2
-        run: cargo build --release --target $TARGET
+        
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{with.target}}
         
         if: startsWith(matrix.config.os, 'windows') # not sure if a target is needed here
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-        run: cargo build --release 
-        
+
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+
       - name: Copy files to be compressed
         run: |
           cp README.md ./dist
