@@ -5,13 +5,13 @@ jobs:
     runs-on: ubuntu-latest
     name: CI workflow
     steps:
-    - name: checkout source repo
-      uses: actions/checkout@v2
+      - name: checkout source repo
+        uses: actions/checkout@v2
 
-    - name: linting
-      uses: programmingwithalex/pylinters@v1.4.2
-      with:
-        python-root: '.'
-        flake8-flags: '--max-line-length 120'
-        mypy-flags: '--ignore-missing-imports --install-types --non-interactive'
-        fail-on-isort: true
+      - name: linting
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+          command: clean
