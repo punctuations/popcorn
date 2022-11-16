@@ -5,7 +5,6 @@ use notify::{watcher, DebouncedEvent, RecursiveMode, Watcher};
 use regex::Regex;
 use std::fs::{self, create_dir_all, remove_dir_all, File, Permissions};
 use std::io::Write;
-use std::os::unix::prelude::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::mpsc::channel;
@@ -119,11 +118,6 @@ fn dev_compile(config: Config) -> Result<(), ()> {
     .unwrap()
     .permissions();
     set_permissions(&mut perms, 0o511);
-
-    if perms.mode() != 0o511 {
-        Print::error("Unable to change file permissions.");
-        return Err(());
-    }
 
     Ok(())
 }

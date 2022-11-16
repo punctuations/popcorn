@@ -4,7 +4,6 @@ use clap::Parser;
 use std::env;
 use std::fs::{self, File, OpenOptions};
 use std::io::{prelude::*, BufReader};
-use std::os::unix::prelude::PermissionsExt;
 use std::path::PathBuf;
 use std::process::Command;
 use std::thread;
@@ -364,11 +363,6 @@ pub fn build_thread(
     .unwrap()
     .permissions();
     set_permissions(&mut perms, 0o511);
-
-    if perms.mode() != 0o511 {
-        Print::error("Unable to change file permissions.");
-        return Err(());
-    }
 
     Print::info("Compiled successfully.");
 
