@@ -10,7 +10,9 @@ use std::process::Command;
 use std::thread;
 use std::{fs::create_dir_all, fs::remove_dir_all, path::Path};
 
-use crate::util::{get_config, Config, Print, DEV_DIR, PATHSEP, PROD_DIR, SEP};
+use crate::util::{
+    self, get_config, set_permissions, Config, Print, DEV_DIR, PATHSEP, PROD_DIR, SEP,
+};
 
 use super::install::apply_changes;
 
@@ -361,7 +363,7 @@ pub fn build_thread(
     ))
     .unwrap()
     .permissions();
-    perms.set_mode(0o511);
+    set_permissions(&mut perms, 0o511);
 
     if perms.mode() != 0o511 {
         Print::error("Unable to change file permissions.");
