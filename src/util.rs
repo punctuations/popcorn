@@ -4,6 +4,7 @@ use console::style;
 use dirs;
 use std::collections::hash_map::DefaultHasher;
 use std::env;
+use std::fs::Permissions;
 use std::hash::{Hash, Hasher};
 
 use serde_derive::{Deserialize, Serialize};
@@ -207,4 +208,24 @@ impl Print {
             13,
         )
     }
+}
+
+#[cfg(unix)]
+pub fn set_permissions(metadata_permissions: &mut Permissions, mode: u32) -> Result<(), ()> {
+    use std::os::unix::prelude::PermissionsExt;
+
+    metadata_permissions.set_mode(0o511);
+
+    if metadata_permissions.mode() != 0o511 {
+        Print::error("Unable to change file permissions.");
+        return Err(());
+    }
+
+    Ok(())
+}
+
+#[cfg(not(unix))]
+#[allow(unused)]
+pub fn set_permissions(metadata_permissions: &mut Permissions, mode: u32) -> Result<(), ()> {
+    Ok(())
 }

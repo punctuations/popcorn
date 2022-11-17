@@ -5,13 +5,13 @@ use notify::{watcher, DebouncedEvent, RecursiveMode, Watcher};
 use regex::Regex;
 use std::fs::{self, create_dir_all, remove_dir_all, File};
 use std::io::Write;
-use std::os::unix::prelude::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::mpsc::channel;
 use std::time::Instant;
 use std::{env, thread, time};
 
+use crate::util::set_permissions;
 use crate::util::{blame::BLAME, get_config, Config, Print, DEV_DIR, SEP};
 
 use super::build::seed_cmd;
@@ -117,13 +117,7 @@ fn dev_compile(config: Config) -> Result<(), ()> {
     ))
     .unwrap()
     .permissions();
-    perms.set_mode(0o511);
-
-    if perms.mode() != 0o511 {
-        Print::error("Unable to change file permissions.");
-        return Err(());
-    }
-
+    set_permissions(&mut perms, 0o511);
     Ok(())
 }
 
