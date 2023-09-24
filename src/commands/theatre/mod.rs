@@ -2,8 +2,8 @@ use flate2::read::GzDecoder;
 use progress_bar::*;
 use reqwest::header::USER_AGENT;
 use reqwest::Url;
-use std::fs::{self, create_dir_all, read_dir, remove_dir_all, DirEntry};
-use std::io::{self, Cursor, Read};
+use std::fs::{self, create_dir_all, read_dir, remove_dir_all, DirEntry, OpenOptions};
+use std::io::{self, BufReader, Cursor, Read};
 use std::thread;
 use std::{fs::File, path::Path, process::Command};
 use tar::Archive;
@@ -12,7 +12,9 @@ use anyhow::Result;
 use clap::Parser;
 
 use crate::util::blame::BLAME;
-use crate::util::{calculate_hash, open_config, Config, GithubTags, Print, PROD_DIR, SEP, TMP};
+use crate::util::{
+    calculate_hash, open_config, update_ver_cache, Config, GithubTags, Print, PROD_DIR, SEP, TMP,
+};
 
 use super::build::build_thread;
 
@@ -26,7 +28,7 @@ pub struct Options {
     url: bool,
 }
 
-fn download_kernel(url: String, file_name: String) -> Result<String, String> {
+pub fn download_kernel(url: String, file_name: String) -> Result<String, String> {
     create_dir_all(TMP());
 
     init_progress_bar(2);
@@ -115,6 +117,15 @@ fn download_kernel(url: String, file_name: String) -> Result<String, String> {
         file_ext = file_ext
     ));
 
+    // used for version at end of download
+    let checksum = md5::compute(format!(
+        "{TMP_DIR}{sep}{file_name}{file_ext}",
+        file_name = file_name,
+        sep = SEP,
+        TMP_DIR = TMP(),
+        file_ext = file_ext
+    ));
+
     if cfg!(target_os = "windows") {
         let mut deflate = source.unwrap();
         let mut data = Vec::new();
@@ -153,8 +164,7 @@ fn download_kernel(url: String, file_name: String) -> Result<String, String> {
         };
 
         // untaring will save it to incorrect dir, need to move contents of dir outside of it.
-        let files =
-            read_dir(format!("{}{sep}{}-download", TMP(), file_name, sep = SEP)).unwrap();
+        let files = read_dir(format!("{}{sep}{}-download", TMP(), file_name, sep = SEP)).unwrap();
 
         // ensure the final dir is empty/non-existant so no errors are thrown during rename
         remove_dir_all(format!("{}{sep}{}", TMP(), file_name, sep = SEP));
@@ -194,12 +204,27 @@ fn download_kernel(url: String, file_name: String) -> Result<String, String> {
         }
     }
 
+    let config = match open_config(&format!(
+        "{}{SEP}{}{SEP}.kernelrc",
+        TMP(),
+        file_name,
+        SEP = SEP
+    )) {
+        Ok(config) => config,
+        Err(_) => todo!(),
+    };
+
+    match update_ver_cache(config.kernel_name, checksum, &url) {
+        Ok(_) => (),
+        Err(err) => return Err(err),
+    }
+
     finalize_progress_bar();
 
     return Ok(format!("{}{sep}{}", TMP(), file_name, sep = SEP));
 }
 
-fn ensure_os_compat(path: String) -> Result<Config, String> {
+pub fn ensure_os_compat(path: String) -> Result<Config, String> {
     let config = match open_config(&format!("{}{SEP}.kernelrc", path, SEP = SEP)) {
         Ok(config) => config,
         Err(_) => {
@@ -229,6 +254,129 @@ fn ensure_os_compat(path: String) -> Result<Config, String> {
 
     Ok(config)
 }
+
+// async fn download_homebrew(pkg: &str) -> Result<(), String> {
+//     // get the ruby homebrew file
+//     let req = match reqwest::Client::new()
+//         .get(format!(
+//             "https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/{}.rb",
+//             pkg.to_lowercase()
+//         ))
+//         .header(USER_AGENT, format!("Popcorn {}", BLAME.version))
+//         .send()
+//         .await
+//     {
+//         Ok(data) => data,
+//         Err(_) => {
+//             Print::error("Could not fetch data (URL not valid)");
+//             return Ok(());
+//         }
+//     };
+
+//     if req.status() != 200 {
+//         Print::error("Could not fetch data (does the homebrew pkg exist?)");
+//         return Ok(());
+//     }
+
+//     let ruby = match req.text().await {
+//         Ok(txt) => txt,
+//         Err(err) => {
+//             Print::error(&format!("Unable to get text response; {}", err));
+//             return Ok(());
+//         }
+//     };
+
+//     // parse the ruby from the homebrew pkg
+
+//     let (kernel_name, url) = match parse_class(ruby) {
+//         Ok((kernel_name, url)) => (kernel_name, url),
+//         Err(()) => return Ok(()),
+//     };
+
+//     // download
+
+//     let mut file_ext = "";
+
+//     if cfg!(target_os = "windows") {
+//         file_ext = ".zip";
+
+//         if let Ok(mut child) = Command::new("Invoke-WebRequest")
+//             .args([
+//                 &url,
+//                 "-Out",
+//                 &format!(
+//                     "{TMP_DIR}{sep}{file_name}{file_ext}",
+//                     sep = SEP,
+//                     file_name = kernel_name,
+//                     TMP_DIR = TMP(),
+//                     file_ext = file_ext
+//                 ),
+//             ])
+//             .spawn()
+//         {
+//             let finished = child.wait().unwrap();
+//             if !finished.success() {
+//                 return Err("An error occured while downloading the kernel".to_string());
+//             }
+//         } else {
+//             return Err("Could not run command to download external kernel".to_string());
+//         }
+//     } else {
+//         file_ext = ".tar.gz";
+
+//         if let Ok(mut child) = Command::new("curl")
+//             .args([
+//                 "--silent",
+//                 &url,
+//                 "-L",
+//                 "--output",
+//                 &format!(
+//                     "{TMP_DIR}{sep}{file_name}{file_ext}",
+//                     sep = SEP,
+//                     file_name = kernel_name,
+//                     TMP_DIR = TMP(),
+//                     file_ext = file_ext
+//                 ),
+//             ])
+//             .spawn()
+//         {
+//             let finished = child.wait().unwrap();
+//             if !finished.success() {
+//                 return Err("An error occured while downloading the kernel".to_string());
+//             }
+//         } else {
+//             return Err(
+//                 "Could not run command to download external kernel (is curl installed?)"
+//                     .to_string(),
+//             );
+//         }
+//     }
+
+//     // open tar file (to get compressed data)
+//     let f = File::open(format!(
+//         "{TMP_DIR}{sep}{file_name}{file_ext}",
+//         sep = SEP,
+//         file_name = kernel_name,
+//         TMP_DIR = TMP(),
+//         file_ext = file_ext
+//     ))
+//     .unwrap();
+//     let mut reader = BufReader::new(f);
+
+//     let mut compressed_contents = Vec::new();
+
+//     reader.read_to_end(&mut compressed_contents);
+
+//     // calculate md5 hash from compressed bytes
+//     let checksum = md5::compute(compressed_contents);
+
+//     println!("{} @ {}", kernel_name, url);
+//     println!("MD5 Checksum: {:?}", checksum);
+
+//     // final success -> add stuff to versions.txt
+
+//     Ok(())
+// }
 
 fn download_homebrew(pkg: &str) -> Result<(), String> {
     println!("Homebrew download {}", pkg);
@@ -354,6 +502,28 @@ pub async fn handle(options: Options) -> Result<()> {
         let repo = kernel_name_split[0];
         let pkg = kernel_name_split[1];
 
+        // check if package with same name (could be same package) is already installed
+        let dir = &PROD_DIR();
+        let prod_directory = Path::new(dir);
+        let butter_file = prod_directory.join("butter.sh").clone();
+
+        if butter_file.exists() {
+            let butter = OpenOptions::new()
+                .read(true)
+                .append(true)
+                .open(butter_file)
+                .unwrap();
+
+            let mut reader = BufReader::new(butter.try_clone().unwrap());
+            let mut contents = String::new();
+            reader.read_to_string(&mut contents);
+
+            if contents.contains(pkg) {
+                Print::warn("A kernel with this name already exists!");
+                return Ok(());
+            }
+        }
+
         // allow compatibility!
         if repo.to_lowercase() == "homebrew" || repo.to_lowercase() == "brew" {
             download_homebrew(pkg);
@@ -414,7 +584,7 @@ pub async fn handle(options: Options) -> Result<()> {
                 ver.unwrap(),
                 os
             ),
-            file_name,
+            pkg.to_string(),
         ) {
             Ok(path) => path,
             Err(err) => {

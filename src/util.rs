@@ -2,10 +2,12 @@ use anyhow::Result;
 use chrono::Local;
 use console::style;
 use dirs;
+use md5::Digest;
 use std::collections::hash_map::DefaultHasher;
 use std::env;
-use std::fs::Permissions;
+use std::fs::{File, OpenOptions, Permissions};
 use std::hash::{Hash, Hasher};
+use std::io::{BufReader, Read, Write};
 
 use serde_derive::{Deserialize, Serialize};
 
@@ -174,6 +176,122 @@ pub fn calculate_hash<T: Hash>(t: &T) -> u64 {
     s.finish()
 }
 
+pub fn update_ver_cache(kernel_name: String, checksum: Digest, url: &str) -> Result<(), String> {
+    let prod_dir = &PROD_DIR();
+    let ver = Path::new(prod_dir).join("versions.txt");
+
+    if !ver.exists() {
+        // version file does not exist
+        match File::create(&ver) {
+            Ok(_) => (),
+            Err(_) => return Err("Unable to create versions file".to_string()),
+        }
+    }
+
+    // check if kernel already there and if checksum matches then replace, if its same checksum then dont add.
+    let versions_file = OpenOptions::new()
+        .read(true)
+        .append(true)
+        .open(ver)
+        .unwrap();
+
+    let mut reader = BufReader::new(versions_file.try_clone().unwrap());
+    let mut contents = String::new();
+    reader.read_to_string(&mut contents);
+
+    if !contents.contains(&kernel_name) {
+        let mut file = match OpenOptions::new()
+            .write(true)
+            .append(true)
+            .open(Path::new(prod_dir).join("versions.txt"))
+        {
+            Ok(file) => file,
+            Err(_e) => return Err("version file not found (unable to create?)".to_string()),
+        };
+
+        file.write(
+            format!(
+                "{kernel} {:?} {url}\n",
+                checksum,
+                kernel = kernel_name,
+                url = url
+            )
+            .as_bytes(),
+        )
+        .unwrap();
+    } else if !contents.contains(&format!("{:x}", checksum)) && contents.contains(&kernel_name) {
+        let split_contents = contents.splitn(2, &kernel_name).collect::<Vec<&str>>();
+        let check_split = split_contents[1].split(" ").collect::<Vec<&str>>();
+        let old_checksum = check_split[1];
+        let remaining_split = split_contents[1].split(old_checksum).collect::<Vec<&str>>();
+        let updated_version_checksum = format!(
+            "{}{} {:x}{}",
+            &split_contents[0], kernel_name, checksum, remaining_split[1]
+        );
+
+        let mut file = match OpenOptions::new()
+            .write(true)
+            .truncate(true)
+            .open(Path::new(prod_dir).join("versions.txt"))
+        {
+            Ok(file) => file,
+            Err(_e) => return Err("version file not found (unable to create?)".to_string()),
+        };
+
+        file.write(updated_version_checksum.as_bytes()).unwrap();
+    }
+
+    Ok(())
+}
+
+// pub fn parse_class(ruby: String) -> Result<(String, String), ()> {
+//     let runtime = minutus::Evaluator::build();
+
+//     let parser = ruby.split("\n").collect::<Vec<&str>>();
+
+//     // fix ruby class
+//     let fixed_ruby: String = parser
+//         .iter()
+//         .map(|x| {
+//             if x.contains("Formula") {
+//                 x.split(" < ").collect::<Vec<&str>>()[0].to_owned() + "\n"
+//             } else {
+//                 x.to_string() + "\n"
+//             }
+//         })
+//         .collect();
+
+//     println!("{}", fixed_ruby);
+
+//     let out = runtime.evaluate(&fixed_ruby).unwrap();
+
+//     println!("{:?}", out);
+
+//     // if above works then dont need this vv
+
+//     let url = parser
+//         .iter()
+//         .filter(|x| x.contains("url"))
+//         .cloned()
+//         .collect::<Vec<&str>>()[0]
+//         .split("\"")
+//         .collect::<Vec<&str>>()[1];
+
+//     // return depends_on(s)
+//     // ...
+
+//     // return install func as seed_cmd
+//     // ...
+
+//     let kernel_name = "cowsay".to_string();
+
+//     if kernel_name == "" || url == "" {
+//         return Err(());
+//     }
+
+//     Ok((kernel_name, url.to_string()))
+// }
+
 pub struct Print;
 
 impl Print {
@@ -211,7 +329,7 @@ impl Print {
 }
 
 #[cfg(unix)]
-pub fn set_permissions(metadata_permissions: &mut Permissions, mode: u32) -> Result<(), ()> {
+pub fn set_permissions(metadata_permissions: &mut Permissions, _mode: u32) -> Result<(), ()> {
     use std::os::unix::prelude::PermissionsExt;
 
     metadata_permissions.set_mode(0o511);

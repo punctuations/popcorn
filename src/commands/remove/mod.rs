@@ -140,7 +140,7 @@ fn remove_dev(kernel_name: String, PATH: String) -> Result<String, String> {
     }
 }
 
-fn remove_prod(kernel_name: String, PATH: String) -> Result<String, String> {
+pub fn remove_prod(kernel_name: String, PATH: String) -> Result<String, String> {
     if PATH.contains(&format!(
         "{PROD}{SEP}{}",
         kernel_name,
@@ -177,7 +177,7 @@ fn remove_prod(kernel_name: String, PATH: String) -> Result<String, String> {
             let prod_directory = Path::new(dir);
             let butter_file = prod_directory.join("butter.sh").clone();
 
-            let mut butter = match OpenOptions::new().read(true).write(true).open(butter_file) {
+            let butter = match OpenOptions::new().read(true).open(&butter_file) {
                 Ok(file) => file,
                 Err(_) => return Err("Unable to open butter file".to_string()),
             };
@@ -185,7 +185,7 @@ fn remove_prod(kernel_name: String, PATH: String) -> Result<String, String> {
             let reader = BufReader::new(butter.try_clone().unwrap());
 
             // filter array
-            let filter: Vec<_> = reader
+            let filter: Vec<String> = reader
                 .lines()
                 .into_iter()
                 .map(|x| x.unwrap())
@@ -195,8 +195,18 @@ fn remove_prod(kernel_name: String, PATH: String) -> Result<String, String> {
             // join contents into string
             let contents_str = filter.join("\n");
 
+            // open and truncate
+            let mut butter_write = match OpenOptions::new()
+                .write(true)
+                .truncate(true)
+                .open(butter_file)
+            {
+                Ok(file) => file,
+                Err(_) => return Err("Unable to open butter file".to_string()),
+            };
+
             // write to file
-            write!(butter, "{}", contents_str);
+            write!(butter_write, "{}\n", contents_str);
 
             // remove it
             match remove_file(removed_kernel.clone()) {

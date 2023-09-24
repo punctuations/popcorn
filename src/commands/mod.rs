@@ -5,6 +5,7 @@ pub mod install;
 pub mod issue;
 pub mod remove;
 pub mod theatre;
+pub mod update;
 use anyhow::Result;
 
 use clap::Subcommand;
@@ -30,6 +31,8 @@ pub enum Commands {
     Dev(dev::Options),
     #[clap(help_template = SUBCOMMAND_HELP, alias = "add", alias = "theater")]
     Theatre(theatre::Options),
+    #[clap(help_template = SUBCOMMAND_HELP)]
+    Update(update::Options),
 }
 
 pub async fn handle_command(command: Commands) -> Result<()> {
@@ -41,5 +44,6 @@ pub async fn handle_command(command: Commands) -> Result<()> {
         Commands::Remove(options) => remove::handle(options).await,
         Commands::Dev(options) => dev::handle(options).await,
         Commands::Theatre(options) => theatre::handle(options).await,
+        Commands::Update(options) => update::handle(options).await,
     }
 }
