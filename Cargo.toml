@@ -1,0 +1,44 @@
+[package]
+name = "popcorn"
+version = "2.0.0"
+edition = "2021"
+license = "MIT"
+authors = ["Matt <matt@dont-ping.me>"]
+description = "An all-system package manager."
+repository = "https://github.com/punctuations/popcorn"
+#build = "build.rs"
+#
+#[package.metadata.winres]
+#ProductName = "Popcorn"
+#OriginalFilename = "popcorn.exe"
+#LegalCopyright = "© 2022 Matt"
+#FileDescription = "An all-system package manager."
+
+[[bin]]
+name = "popcorn"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+regex = "1"
+md5 = "0.7.0"
+flate2 = "1.0"
+tar = "0.4.38"
+log = "0.4.17"
+chrono = "0.4"
+dirs = "4.0.0"
+state = "0.5.3"
+notify = "4.0.0"
+serde = "1.0.117"
+anyhow = "1.0.59"
+console = "0.15.1"
+webbrowser = "0.8.0"
+zip-extract = "0.1.1"
+serde_json = "1.0.59"
+progress_bar = "1.0.3"
+serde_derive = "1.0.117"
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1.20.1", features = ["full"] }
+clap = { version = "3.2.16", features = ["derive"] }
+async-compression = { version = "0.3.14", features = ["tokio", "gzip"] }

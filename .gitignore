@@ -1,13 +1,14 @@
 # editors
 .idea
 .vscode
+.fleet
 
 # python
 **/__pycache__
 venv
 
 # pyinstaller
-build
+/build
 dist
 
 # internal
@@ -15,3 +16,7 @@ dist
 
 # my list
 **/TODO
+
+# Added by cargo
+
+/target

@@ -1,10 +1,10 @@
-on: ['push', 'pull_request']
+on: ["push", "pull_request"]
 
 jobs:
   compile_exec:
     name: Compile to executables
     runs-on: ${{ matrix.config.os }}
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/rewrite' # just to see if it works
     strategy:
       matrix:
         config:
@@ -13,14 +13,23 @@ jobs:
           - os: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup python
-        uses: actions/setup-python@v3
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
         with:
-          python-version: '3.9'
-      - name: Install dependencies for ${{ matrix.config.os }}
-        run: |
-          python -m pip install --upgrade pip wheel setuptools
-          pip install -r requirements.txt
-          pip install pyinstaller
-      - name: Build with pyinstaller for ${{ matrix.config.os }}
-        run: pyinstaller popcorn.spec
+          toolchain: stable
+
+      - name: Install dependencies on Ubuntu
+        if: startsWith(matrix.config.os, 'ubuntu')
+        run: sudo apt-get update && sudo apt-get install cmake pkg-config libgtk-3-dev
+
+      - name: Update toolchain
+        run: rustup update
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build with Cargo
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
