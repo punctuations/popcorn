@@ -165,7 +165,7 @@ pub fn remove_prod(kernel_name: String, PATH: String) -> Result<String, String> 
                 Err(err) => Err(err),
             };
         } else {
-            if kernel_name == "butter.sh" {
+            if kernel_name == "butter.sh" || kernel_name == "versions.txt" {
                 return Err("Not a kernel".to_string());
             }
 
